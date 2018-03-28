@@ -1,0 +1,96 @@
+#! /bin/sh
+#  /etc/init.d/jble6lowpanshoveld
+
+### BEGIN INIT INFO
+# Provides:          jble6lowpanshoveld
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Short-Description: Starts the Bluetooth 6Lowpan message shovel service
+# Description:       This file is used to start the daemon
+#                    and should be placed in /etc/init.d
+### END INIT INFO
+
+# Author:   Joel Frazier <frazieje@gmail.com>
+# Date:     11/02/2017
+
+NAME="jble6lowpanshoveld"
+DESC="Bluetooth 6Lowpan message shovel service"
+
+# The path to the folder of the repository
+FILE_PATH="<% install_path %>"
+
+# The path to Jsvc
+EXEC="/usr/bin/jsvc"
+
+# The path to the java executable
+CLI_EXEC="$JAVA_HOME/bin/java"
+
+# The path to the jar file
+JAR_PATH="$FILE_PATH/build/libs/jble6lowpanshoveld-0.1.jar"
+
+# The path to the logging framework to be linked for the daemon via slf4j
+LOG_CLASS_PATH="$FILE_PATH/build/output/libs/logback-classic-1.2.3.jar:$FILE_PATH/build/output/libs/logback-core-1.2.3.jar"
+
+# Our classpath including our jar file
+CLASS_PATH="$JAR_PATH:$FILE_PATH/build/output/libs/commons-daemon-1.0.15.jar:$FILE_PATH/build/output/libs/slf4j-api-1.7.25.jar:$LOG_CLASS_PATH"
+
+# The fully qualified name of the class to execute
+CLASS="com.spoohapps.jble6lowpanshoveld.ShovelDaemon"
+
+# Any command line arguments to be passed to the our Java Daemon implementations init() method 
+ARGS=""
+
+# The file that will contain our process identification number (pid) for other scripts/programs that need to access it.
+PID="/var/run/$NAME.pid"
+
+# System.out writes to this file...
+LOG_OUT="$FILE_PATH/log/$NAME.out"
+
+# System.err writes to this file...
+LOG_ERR="$FILE_PATH/err/$NAME.err"
+
+jsvc_exec()
+{   
+    cd $FILE_PATH
+    $EXEC -home $JAVA_HOME -cp $CLASS_PATH -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS $ARGS
+}
+
+case "$1" in
+    start)  
+        echo "Starting the $DESC..."        
+
+        # Start the service
+        jsvc_exec
+        
+        echo "The $DESC has started."
+    ;;
+    stop)
+        echo "Stopping the $DESC..."
+
+        # Stop the service
+        jsvc_exec "-stop"       
+        
+        echo "The $DESC has stopped."
+    ;;
+    restart)
+        if [ -f "$PID" ]; then
+            
+            echo "Restarting the $DESC..."
+            
+            # Stop the service
+            jsvc_exec "-stop"
+            
+            # Start the service
+            jsvc_exec
+            
+            echo "The $DESC has restarted."
+        else
+            echo "Daemon not running, no action taken"
+            exit 1
+        fi
+    ;;
+    *)
+        echo "Usage: /etc/init.d/$NAME {start|stop|restart}" >&2
+        exit 3
+    ;;
+esac
