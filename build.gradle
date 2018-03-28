@@ -50,6 +50,7 @@ task generateInitScript {
         matches.appendReplacement(sb, template_vars.get(matches[i].substring(2, matches[i].length()-2).trim()))
     }
     matches.appendTail(sb)
+    new File("$buildDir").mkdir()
     new File("$buildDir/output").mkdir()
     new File("$buildDir/output/init").mkdir()
     if (java_home?.trim()) {
