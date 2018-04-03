@@ -1,5 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,6 +15,15 @@ public class ShovelDaemonTests {
     @BeforeAll
     public void context() {
         daemon = new ShovelDaemon();
+    }
+
+    @AfterAll
+    public void teardown() {
+        try {
+            daemon.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
