@@ -12,51 +12,35 @@ import java.util.stream.Stream;
 public class Config implements ShovelDaemonConfig {
 
     private static final List<String> profileFilePathKeys = Arrays.asList("profileFilePath", "f");
-    private static final List<String> apiUrlKeys = Arrays.asList("apiUrl", "a");
-    private static final List<String> apiExchangeKeys = Arrays.asList("apiExchange", "x");
+    private static final List<String> apiHostKeys = Arrays.asList("apiHost", "a");
+    private static final List<String> nodeHostKeys = Arrays.asList("nodeHost", "n");
     private static final List<String> apiPortKeys = Arrays.asList("apiPort", "p");
-    private static final List<String> incomingExchangeKeys = Arrays.asList("incomingExchange", "i");
-    private static final List<String> deviceExchangeKeys = Arrays.asList("deviceExchange", "d");
-    private static final List<String> appExchangeKeys = Arrays.asList("appExchange", "b");
-    private static final List<String> outgoingExchangeKeys = Arrays.asList("outgoingExchange", "o");
-    private static final List<String> localPortKeys = Arrays.asList("localPort", "l");
+    private static final List<String> nodePortKeys = Arrays.asList("nodePort", "l");
 
     private static final Set<String> keys =
             Stream.of(profileFilePathKeys,
-                        apiUrlKeys,
-                        apiExchangeKeys,
+                        apiHostKeys,
+                        nodeHostKeys,
                         apiPortKeys,
-                        incomingExchangeKeys,
-                        deviceExchangeKeys,
-                        appExchangeKeys,
-                        outgoingExchangeKeys,
-                        localPortKeys)
+                        nodePortKeys)
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
 
     private String profileFilePath;
-    private String apiUrl;
-    private String apiExchange;
+    private String apiHost;
+    private String nodeHost;
     private int apiPort;
-    private int localPort;
-    private String incomingExchange;
-    private String deviceExchange;
-    private String appExchange;
-    private String outgoingExchange;
+    private int nodePort;
 
     private Config() {}
 
     public static Config fromDefaults() {
         Config config = new Config();
         config.profileFilePath = "./profile.conf";
-        config.apiUrl = "";
-        config.apiExchange = "amq.app";
+        config.apiHost = "";
+        config.nodeHost = "";
         config.apiPort = 5672;
-        config.incomingExchange = "amq.incoming";
-        config.deviceExchange = "amq.device";
-        config.appExchange = "amq.app";
-        config.outgoingExchange = "amq.outgoing";
-        config.localPort = 5672;
+        config.nodePort = 5672;
         return config;
     }
 
@@ -139,6 +123,7 @@ public class Config implements ShovelDaemonConfig {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static Config fromArgs(String[] args) {
         Config config = new Config();
         for (int i = 0; i < args.length; i++) {
@@ -203,13 +188,13 @@ public class Config implements ShovelDaemonConfig {
     }
 
     @Override
-    public String apiUrl() {
-        return apiUrl;
+    public String apiHost() {
+        return apiHost;
     }
 
     @Override
-    public String apiExchange() {
-        return apiExchange;
+    public String nodeHost() {
+        return nodeHost;
     }
 
     @Override
@@ -218,27 +203,8 @@ public class Config implements ShovelDaemonConfig {
     }
 
     @Override
-    public int localPort() {
-        return localPort;
+    public int nodePort() {
+        return nodePort;
     }
 
-    @Override
-    public String incomingExchange() {
-        return incomingExchange;
-    }
-
-    @Override
-    public String deviceExchange() {
-        return deviceExchange;
-    }
-
-    @Override
-    public String appExchange() {
-        return appExchange;
-    }
-
-    @Override
-    public String outgoingExchange() {
-        return outgoingExchange;
-    }
 }

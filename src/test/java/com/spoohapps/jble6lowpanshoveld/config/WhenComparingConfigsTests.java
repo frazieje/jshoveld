@@ -22,24 +22,16 @@ public class WhenComparingConfigsTests {
                 "-a", "",
                 "-p", "" + 5672,
                 "-l", "" + 5672,
-                "-f", "./profile.conf",
-                "-x", "amq.app",
-                "-i", "amq.incoming",
-                "-d", "amq.device",
-                "-b", "amq.app",
-                "-o", "amq.outgoing"
+                "-"
+                "-f", "./profile.conf"
         };
 
         String[] verboseArgs = new String[] {
-                "-apiUrl", "",
+                "-apiHost", "",
                 "-apiPort", "" + 5672,
-                "-localPort", "" + 5672,
-                "-profileFilePath", "./profile.conf",
-                "-apiExchange", "amq.app",
-                "-incomingExchange", "amq.incoming",
-                "-deviceExchange", "amq.device",
-                "-appExchange", "amq.app",
-                "-outgoingExchange", "amq.outgoing"
+                "-nodePort", "" + 5672,
+                "-nodeHost", "",
+                "-profileFilePath", "./profile.conf"
         };
 
         assertEquals(Config.fromArgs(simpleArgs), Config.fromArgs(verboseArgs));

@@ -10,14 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class WhenCascadingConfigsTests {
 
     private String expectedProfileFilePath = "./profile.conf";
-    private String expectedApiUrl = "http://www.spoohapps.com/";
+    private String expectedApiUrl = "www.spoohapps.com/";
+    private String expectedNodeHost = "localhost";
+
     private int expectedApiPort = 9999;
-    private int expectedLocalPort = 9998;
-    private String expectedApiExchange = "some exchange";
-    private String expectedIncomingExchange = "an exchange";
-    private String expectedDeviceExchange = "device exchange";
-    private String expectedAppExchange = "the app exchange";
-    private String expectedOutgoingExchange = "outgoing exchange";
+    private int expectedNodePort = 9998;
 
     private ShovelDaemonConfig config;
 
@@ -28,24 +25,15 @@ public class WhenCascadingConfigsTests {
                 "-a", "",
                 "-p", "" + 5672,
                 "-l", "" + 5672,
-                "-f", "./profile.conf",
-                "-x", "amq.app",
-                "-i", "amq.incoming",
-                "-d", "amq.device",
-                "-b", "amq.app",
-                "-o", "amq.outgoing"
+                "-f", "./profile.conf"
         };
 
         String[] verboseArgs = new String[] {
-                "-apiUrl", expectedApiUrl,
+                "-apiHost", expectedApiUrl,
                 "-apiPort", "" + expectedApiPort,
-                "-localPort", "" + expectedLocalPort,
+                "-nodeHost", expectedNodeHost,
+                "-nodePort", "" + expectedNodePort,
                 "-profileFilePath", expectedProfileFilePath,
-                "-apiExchange", expectedApiExchange,
-                "-incomingExchange", expectedIncomingExchange,
-                "-deviceExchange", expectedDeviceExchange,
-                "-appExchange", expectedAppExchange,
-                "-outgoingExchange", expectedOutgoingExchange
         };
 
         config = Config.fromArgs(simpleArgs).apply(Config.fromArgs(verboseArgs));
@@ -53,7 +41,7 @@ public class WhenCascadingConfigsTests {
 
     @Test
     public void shouldSetApiUrl() {
-        assertEquals(expectedApiUrl, config.apiUrl());
+        assertEquals(expectedApiUrl, config.apiHost());
     }
 
     @Test
@@ -67,33 +55,13 @@ public class WhenCascadingConfigsTests {
     }
 
     @Test
-    public void shouldSetLocalPort() {
-        assertEquals(expectedLocalPort, config.localPort());
+    public void shouldSetNodeHost() {
+        assertEquals(expectedNodeHost, config.nodeHost());
     }
 
     @Test
-    public void shouldSetApiExchange() {
-        assertEquals(expectedApiExchange, config.apiExchange());
-    }
-
-    @Test
-    public void shouldSetIncomingExchange() {
-        assertEquals(expectedIncomingExchange, config.incomingExchange());
-    }
-
-    @Test
-    public void shouldSetDeviceExchange() {
-        assertEquals(expectedDeviceExchange, config.deviceExchange());
-    }
-
-    @Test
-    public void shouldSetAppExchange() {
-        assertEquals(expectedAppExchange, config.appExchange());
-    }
-
-    @Test
-    public void shouldSetOutgoingExchange() {
-        assertEquals(expectedOutgoingExchange, config.outgoingExchange());
+    public void shouldSetNodePort() {
+        assertEquals(expectedNodePort, config.nodePort());
     }
 }
 

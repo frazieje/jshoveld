@@ -11,7 +11,7 @@ public class WhenLoadingSimpleConfigTests {
 
     private String expectedApiUrl = "http://www.spoohapps.com/";
     private int expectedApiPort = 9999;
-    private int expectedLocalPort = 9998;
+    private int expectedSourcePort = 9998;
 
     private ShovelDaemonConfig config;
 
@@ -20,7 +20,7 @@ public class WhenLoadingSimpleConfigTests {
         String[] args = new String[] {
             "-a", expectedApiUrl,
             "-p", "" + expectedApiPort,
-            "-l", "" + expectedLocalPort
+            "-l", "" + expectedSourcePort
         };
 
         config = Config.fromArgs(args);
@@ -28,7 +28,7 @@ public class WhenLoadingSimpleConfigTests {
 
     @Test
     public void shouldSetApiUrl() {
-        assertEquals(expectedApiUrl, config.apiUrl());
+        assertEquals(expectedApiUrl, config.apiHost());
     }
 
     @Test
@@ -37,8 +37,8 @@ public class WhenLoadingSimpleConfigTests {
     }
 
     @Test
-    public void shouldSetLocalPort() {
-        assertEquals(expectedLocalPort, config.localPort());
+    public void shouldSetSourcePort() {
+        assertEquals(expectedSourcePort, config.nodePort());
     }
 
 }

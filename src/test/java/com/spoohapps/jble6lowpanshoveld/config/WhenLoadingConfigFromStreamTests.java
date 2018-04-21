@@ -17,14 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class WhenLoadingConfigFromStreamTests {
 
     private String expectedProfileFilePath = "./profile.conf";
-    private String expectedApiUrl = "http://www.spoohapps.com/";
+    private String expectedApiUrl = "www.spoohapps.com";
+    private String expectedNodeUrl = "localhost";
     private int expectedApiPort = 9999;
-    private int expectedLocalPort = 9998;
-    private String expectedApiExchange = "some exchange";
-    private String expectedIncomingExchange = "an exchange";
-    private String expectedDeviceExchange = "device exchange";
-    private String expectedAppExchange = "the app exchange";
-    private String expectedOutgoingExchange = "outgoing exchange";
+    private int expectedNodePort = 9998;
 
     private ShovelDaemonConfig config;
 
@@ -33,14 +29,10 @@ public class WhenLoadingConfigFromStreamTests {
 
         List<String> lines = Arrays.asList(
                 "profileFilePath=" + expectedProfileFilePath,
-                "apiUrl=" + expectedApiUrl,
+                "apiHost=" + expectedApiUrl,
                 "apiPort=" + expectedApiPort,
-                "localPort=" + expectedLocalPort,
-                "apiExchange=" + expectedApiExchange,
-                "incomingExchange=" + expectedIncomingExchange,
-                "deviceExchange=" + expectedDeviceExchange,
-                "appExchange=" + expectedAppExchange,
-                "outgoingExchange=" + expectedOutgoingExchange
+                "nodeHost=" + expectedNodeUrl,
+                "nodePort=" + expectedNodePort
         );
 
         String data = lines.stream().map(s -> s + System.lineSeparator()).collect(Collectors.joining());
@@ -57,7 +49,7 @@ public class WhenLoadingConfigFromStreamTests {
 
     @Test
     public void shouldSetApiUrl() {
-        assertEquals(expectedApiUrl, config.apiUrl());
+        assertEquals(expectedApiUrl, config.apiHost());
     }
 
     @Test
@@ -66,32 +58,7 @@ public class WhenLoadingConfigFromStreamTests {
     }
 
     @Test
-    public void shouldSetLocalPort() {
-        assertEquals(expectedLocalPort, config.localPort());
-    }
-
-    @Test
-    public void shouldSetApiExchange() {
-        assertEquals(expectedApiExchange, config.apiExchange());
-    }
-
-    @Test
-    public void shouldSetIncomingExchange() {
-        assertEquals(expectedIncomingExchange, config.incomingExchange());
-    }
-
-    @Test
-    public void shouldSetDeviceExchange() {
-        assertEquals(expectedDeviceExchange, config.deviceExchange());
-    }
-
-    @Test
-    public void shouldSetAppExchange() {
-        assertEquals(expectedAppExchange, config.appExchange());
-    }
-
-    @Test
-    public void shouldSetOutgoingExchange() {
-        assertEquals(expectedOutgoingExchange, config.outgoingExchange());
+    public void shouldSetSourcePort() {
+        assertEquals(expectedNodePort, config.nodePort());
     }
 }
