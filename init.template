@@ -5,6 +5,8 @@
 # Provides:          jble6lowpanshoveld
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
 # Short-Description: Starts the Bluetooth 6Lowpan message shovel service
 # Description:       This file is used to start the daemon
 #                    and should be placed in /etc/init.d
@@ -41,7 +43,7 @@ CLASS_PATH="$JAR_PATH:$FILE_PATH/build/output/libs/commons-daemon-1.0.15.jar:$FI
 CLASS="com.spoohapps.jble6lowpanshoveld.ShovelDaemon"
 
 # Any command line arguments to be passed to the our Java Daemon implementations init() method 
-ARGS=""
+ARGS="-f $FILE_PATH/profile.conf"
 
 # The file that will contain our process identification number (pid) for other scripts/programs that need to access it.
 PID="/var/run/$NAME.pid"
