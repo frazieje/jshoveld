@@ -3,6 +3,8 @@ package com.spoohapps.jble6lowpanshoveld.tasks.connection;
 import com.rabbitmq.client.*;
 
 import com.spoohapps.jble6lowpanshoveld.model.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -22,6 +24,8 @@ public class Amqp091MessageConsumerConnection implements MessageConsumerConnecti
     private Consumer<Message> messageConsumer;
 
     private AtomicBoolean isOpen = new AtomicBoolean(false);
+
+    private final Logger logger = LoggerFactory.getLogger(Amqp091MessageConsumerConnection.class);
 
     public Amqp091MessageConsumerConnection(Supplier<Connection> connection, String exchange, String queue, String routingKey) {
         this.exchange = exchange;
@@ -43,6 +47,7 @@ public class Amqp091MessageConsumerConnection implements MessageConsumerConnecti
     @Override
     public void open() {
         try {
+            logger.info("opening consumer connection...");
             channel = connection.get().createChannel();
             channel.exchangeDeclare(exchange, BuiltinExchangeType.TOPIC, true);
             channel.queueDeclare(queue, true, false, false, null);
@@ -51,6 +56,7 @@ public class Amqp091MessageConsumerConnection implements MessageConsumerConnecti
             channel.basicConsume(queue, false, this::consumeInternal, this::handleShutdownSignal);
 
             isOpen.set(true);
+            logger.info("consumer connection opened.");
         } catch (IOException e) {
             //log exception
             e.printStackTrace();
@@ -88,6 +94,7 @@ public class Amqp091MessageConsumerConnection implements MessageConsumerConnecti
     }
 
     private void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
+        logger.error("connection shutdown: " + sig.getMessage());
         isOpen.set(false);
     }
 }

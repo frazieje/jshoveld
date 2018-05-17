@@ -19,6 +19,7 @@ public class IncomingMessageHandler implements MessageHandler {
 
     @Override
     public void start() {
+        logger.info("starting incoming message handler...");
         publisher.open();
         consumer.open();
         consumer.consume(this::handleMessage);
@@ -38,12 +39,12 @@ public class IncomingMessageHandler implements MessageHandler {
     @Override
     public void handleMessage(Message message) {
 
-        logger.info("consumed message with topic {}", message.getTopic());
+        logger.info("consumed message with topic {}, hops {}", message.getTopic(), message.getHops());
 
-        String newTopic = message.getTopic();
+        if (message.getHops() == 0) {
+            Message newMessage = new Message(message.getTopic(), message.getHops()+1, message.getPayload());
 
-        Message newMessage = new Message(newTopic, message.getHops(), message.getPayload());
-
-        publisher.publish(newMessage);
+            publisher.publish(newMessage);
+        }
     }
 }

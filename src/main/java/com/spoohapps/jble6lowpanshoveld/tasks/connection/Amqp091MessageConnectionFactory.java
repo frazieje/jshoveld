@@ -3,6 +3,8 @@ package com.spoohapps.jble6lowpanshoveld.tasks.connection;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ShutdownSignalException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -16,6 +18,8 @@ public class Amqp091MessageConnectionFactory implements MessageConnectionFactory
 
     Connection activeConnection;
     AtomicBoolean isOpen = new AtomicBoolean(false);
+
+    private final Logger logger = LoggerFactory.getLogger(Amqp091MessageConnectionFactory.class);
 
     public Amqp091MessageConnectionFactory(ExecutorService executorService, String host, int port, String username, String password) {
 
@@ -39,10 +43,13 @@ public class Amqp091MessageConnectionFactory implements MessageConnectionFactory
     }
 
     private Connection getOrCreateConnection() {
+        logger.info("getting connection");
         if (activeConnection != null && isOpen.get()) {
+            logger.info("returning active connection");
             return activeConnection;
         }
         try {
+            logger.info("creating connection");
             activeConnection = connectionFactory.newConnection(executorService);
             isOpen.set(true);
             activeConnection.addShutdownListener(this::shutdownCompleted);

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ public class Config implements ShovelDaemonConfig {
 
     public static Config fromDefaults() {
         Config config = new Config();
-        config.profileFilePath = "./profile.conf";
+        config.profileFilePath = Paths.get(System.getProperty("user.home"), "profile.conf").toString();
         config.apiHost = "";
         config.nodeHost = "";
         config.apiPort = 5672;

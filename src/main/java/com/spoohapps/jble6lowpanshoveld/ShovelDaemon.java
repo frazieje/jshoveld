@@ -5,10 +5,13 @@ import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.handlers.IncomingMessageHandler;
 import com.spoohapps.jble6lowpanshoveld.tasks.handlers.MessageHandler;
+import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
+import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
 import org.apache.commons.daemon.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +23,9 @@ public class ShovelDaemon implements Daemon {
     private ExecutorService executorService;
     private ShovelDaemonConfig shovelDaemonConfig;
 
-    private MessageConnectionFactory sourceConnectionFactory;
+    private ProfileManager profileManager;
+
+    private MessageConnectionFactory nodeConnectionFactory;
 
     private MessageConnectionFactory apiConnectionFactory;
 
@@ -30,13 +35,15 @@ public class ShovelDaemon implements Daemon {
 
     public ShovelDaemon() {}
 
-    public ShovelDaemon(ShovelDaemonConfig config, MessageConnectionFactory sourceConnectionFactory, MessageConnectionFactory apiConnectionFactory) {
+    public ShovelDaemon(ShovelDaemonConfig config, MessageConnectionFactory nodeConnectionFactory, MessageConnectionFactory apiConnectionFactory, ProfileManager profileManager) {
 
         shovelDaemonConfig = config;
 
-        this.sourceConnectionFactory = sourceConnectionFactory;
+        this.nodeConnectionFactory = nodeConnectionFactory;
 
         this.apiConnectionFactory = apiConnectionFactory;
+
+        this.profileManager = profileManager;
 
         executorService = Executors.newFixedThreadPool(10);
     }
@@ -63,10 +70,19 @@ public class ShovelDaemon implements Daemon {
         logger.info("source host: {}", shovelDaemonConfig.nodeHost());
         logger.info("source port: {}", shovelDaemonConfig.nodePort());
 
-        sourceConnectionFactory = new Amqp091MessageConnectionFactory(
+        profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
+
+        nodeConnectionFactory = new Amqp091MessageConnectionFactory(
                 executorService,
                 shovelDaemonConfig.nodeHost(),
                 shovelDaemonConfig.nodePort(),
+                "jble6lowpanshoveld",
+                "jble6lowpanshoveld");
+
+        apiConnectionFactory = new Amqp091MessageConnectionFactory(
+                executorService,
+                shovelDaemonConfig.apiHost(),
+                shovelDaemonConfig.apiPort(),
                 "jble6lowpanshoveld",
                 "jble6lowpanshoveld");
     }
@@ -75,6 +91,8 @@ public class ShovelDaemon implements Daemon {
     public void start() throws Exception {
 
         logger.info("Starting...");
+
+        profileManager.start();
 
         addIncomingMessageHandler();
 
@@ -87,6 +105,8 @@ public class ShovelDaemon implements Daemon {
         logger.info("Stopping...");
 
         messageHandlers.forEach(MessageHandler::stop);
+
+        profileManager.stop();
 
         executorService.shutdown();
         try {
@@ -123,15 +143,15 @@ public class ShovelDaemon implements Daemon {
     private void addIncomingMessageHandler() {
 
         MessageConnectionSettings consumerSettings = new Amqp091MessageConsumerConnectionSettings(
-                    "far.app",
+                    "far.incoming",
                     IncomingMessageHandler.class.getSimpleName(),
-                    "#");
+                    profileManager.get() + ".#");
 
         MessageConnectionSettings publisherSettings = new Amqp091MessagePublisherConnectionSettings(
-                    "far.incoming");
+                    "far.app");
 
         messageHandlers.add(new IncomingMessageHandler(
-                sourceConnectionFactory.newConsumerConnection(consumerSettings),
-                sourceConnectionFactory.newPublisherConnection(publisherSettings)));
+                apiConnectionFactory.newConsumerConnection(consumerSettings),
+                nodeConnectionFactory.newPublisherConnection(publisherSettings)));
     }
 }

@@ -2,6 +2,8 @@ package com.spoohapps.jble6lowpanshoveld.tasks.connection;
 
 import com.rabbitmq.client.*;
 import com.spoohapps.jble6lowpanshoveld.model.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,6 +19,8 @@ public class Amqp091MessagePublisherConnection implements MessagePublisherConnec
     private Channel channel;
 
     private AtomicBoolean isOpen = new AtomicBoolean(false);
+
+    private final Logger logger = LoggerFactory.getLogger(Amqp091MessagePublisherConnection.class);
 
     public Amqp091MessagePublisherConnection(Supplier<Connection> connection, String exchange) {
         this.exchange = exchange;
@@ -50,11 +54,14 @@ public class Amqp091MessagePublisherConnection implements MessagePublisherConnec
     @Override
     public void open() {
         try {
+            logger.info("opening publisher connection...");
             channel = connection.get().createChannel();
             channel.exchangeDeclare(exchange, BuiltinExchangeType.TOPIC, true);
             channel.addShutdownListener(this::handleShutdown);
             isOpen.set(true);
+            logger.info("publisher connection opened");
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
             isOpen.set(false);
         }
