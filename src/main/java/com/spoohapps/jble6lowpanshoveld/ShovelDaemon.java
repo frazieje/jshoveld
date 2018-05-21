@@ -3,6 +3,10 @@ package com.spoohapps.jble6lowpanshoveld;
 import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionFactory;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091PublisherConnectionSettings;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
 import com.spoohapps.jble6lowpanshoveld.tasks.handlers.IncomingMessageHandler;
 import com.spoohapps.jble6lowpanshoveld.tasks.handlers.MessageHandler;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
@@ -25,9 +29,9 @@ public class ShovelDaemon implements Daemon {
 
     private ProfileManager profileManager;
 
-    private MessageConnectionFactory nodeConnectionFactory;
+    private ConnectionFactory nodeConnectionFactory;
 
-    private MessageConnectionFactory apiConnectionFactory;
+    private ConnectionFactory apiConnectionFactory;
 
     private List<MessageHandler> messageHandlers = new ArrayList<>();
 
@@ -35,7 +39,7 @@ public class ShovelDaemon implements Daemon {
 
     public ShovelDaemon() {}
 
-    public ShovelDaemon(ShovelDaemonConfig config, MessageConnectionFactory nodeConnectionFactory, MessageConnectionFactory apiConnectionFactory, ProfileManager profileManager) {
+    public ShovelDaemon(ShovelDaemonConfig config, ConnectionFactory nodeConnectionFactory, ConnectionFactory apiConnectionFactory, ProfileManager profileManager) {
 
         shovelDaemonConfig = config;
 
@@ -72,19 +76,23 @@ public class ShovelDaemon implements Daemon {
 
         profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
 
-        nodeConnectionFactory = new Amqp091MessageConnectionFactory(
+        RabbitMqAmqp091ConnectionSupplier nodeRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
                 executorService,
                 shovelDaemonConfig.nodeHost(),
                 shovelDaemonConfig.nodePort(),
                 "jble6lowpanshoveld",
                 "jble6lowpanshoveld");
 
-        apiConnectionFactory = new Amqp091MessageConnectionFactory(
+        nodeConnectionFactory = new Amqp091ConnectionFactory(nodeRabbitMqConnectionSupplier);
+
+        RabbitMqAmqp091ConnectionSupplier apiRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
                 executorService,
                 shovelDaemonConfig.apiHost(),
                 shovelDaemonConfig.apiPort(),
                 "jble6lowpanshoveld",
                 "jble6lowpanshoveld");
+
+        apiConnectionFactory = new Amqp091ConnectionFactory(apiRabbitMqConnectionSupplier);
     }
 
     @Override
@@ -142,16 +150,14 @@ public class ShovelDaemon implements Daemon {
 
     private void addIncomingMessageHandler() {
 
-        MessageConnectionSettings consumerSettings = new Amqp091MessageConsumerConnectionSettings(
+        ConnectionSettings sourceSettings = new Amqp091ConsumerConnectionSettings(
                     "far.incoming",
                     IncomingMessageHandler.class.getSimpleName(),
                     profileManager.get() + ".#");
 
-        MessageConnectionSettings publisherSettings = new Amqp091MessagePublisherConnectionSettings(
+        ConnectionSettings destinationSettings = new Amqp091PublisherConnectionSettings(
                     "far.app");
 
-        messageHandlers.add(new IncomingMessageHandler(
-                apiConnectionFactory.newConsumerConnection(consumerSettings),
-                nodeConnectionFactory.newPublisherConnection(publisherSettings)));
+        messageHandlers.add(new IncomingMessageHandler(apiConnectionFactory, sourceSettings, nodeConnectionFactory, destinationSettings));
     }
 }

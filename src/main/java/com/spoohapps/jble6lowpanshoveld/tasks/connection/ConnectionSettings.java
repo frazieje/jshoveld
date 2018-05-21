@@ -1,5 +1,5 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.connection;
 
-public interface MessageConnectionSettings {
+public interface ConnectionSettings {
     String get(String key);
 }

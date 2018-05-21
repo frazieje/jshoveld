@@ -4,9 +4,9 @@ import com.spoohapps.jble6lowpanshoveld.model.Message;
 
 import java.util.function.Consumer;
 
-public interface MessageConsumerConnection {
-    boolean isOpen();
+public interface ConsumerConnection {
     void open();
     void close();
-    void consume(Consumer<Message> messageConsumer);
+    void onClosed(Runnable closed);
+    void onConsume(Consumer<Message> messageConsumer);
 }

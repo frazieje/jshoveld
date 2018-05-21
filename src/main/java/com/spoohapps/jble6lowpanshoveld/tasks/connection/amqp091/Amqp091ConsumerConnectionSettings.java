@@ -1,6 +1,8 @@
-package com.spoohapps.jble6lowpanshoveld.tasks.connection;
+package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091;
 
-public class Amqp091MessageConsumerConnectionSettings implements MessageConnectionSettings {
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
+
+public class Amqp091ConsumerConnectionSettings implements ConnectionSettings {
 
     private String exchange;
 
@@ -8,7 +10,7 @@ public class Amqp091MessageConsumerConnectionSettings implements MessageConnecti
 
     private String routingKey;
 
-    public Amqp091MessageConsumerConnectionSettings(String exchange, String queue, String routingKey) {
+    public Amqp091ConsumerConnectionSettings(String exchange, String queue, String routingKey) {
         this.exchange = exchange;
         this.queue = queue;
         this.routingKey = routingKey;

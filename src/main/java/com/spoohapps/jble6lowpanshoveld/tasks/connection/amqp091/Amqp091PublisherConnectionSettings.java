@@ -1,10 +1,12 @@
-package com.spoohapps.jble6lowpanshoveld.tasks.connection;
+package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091;
 
-public class Amqp091MessagePublisherConnectionSettings implements MessageConnectionSettings {
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
+
+public class Amqp091PublisherConnectionSettings implements ConnectionSettings {
 
     private String exchange;
 
-    public Amqp091MessagePublisherConnectionSettings(String exchange) {
+    public Amqp091PublisherConnectionSettings(String exchange) {
         this.exchange = exchange;
     }
 
