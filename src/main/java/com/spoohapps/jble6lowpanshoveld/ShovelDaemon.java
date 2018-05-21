@@ -7,10 +7,11 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091Connecti
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091PublisherConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
-import com.spoohapps.jble6lowpanshoveld.tasks.handlers.IncomingMessageHandler;
-import com.spoohapps.jble6lowpanshoveld.tasks.handlers.MessageHandler;
+import com.spoohapps.jble6lowpanshoveld.tasks.shovels.AbstractMessageShovel;
+import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
+import com.spoohapps.jble6lowpanshoveld.tasks.shovels.RemoteMessageRetrievalShovel;
 import org.apache.commons.daemon.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public class ShovelDaemon implements Daemon {
 
     private ConnectionFactory apiConnectionFactory;
 
-    private List<MessageHandler> messageHandlers = new ArrayList<>();
+    private List<MessageShovel> messageShovels = new ArrayList<>();
 
     private final Logger logger = LoggerFactory.getLogger(ShovelDaemon.class);
 
@@ -102,9 +103,9 @@ public class ShovelDaemon implements Daemon {
 
         profileManager.start();
 
-        addIncomingMessageHandler();
+        addRemoteRetrievalMessageHandler();
 
-        messageHandlers.forEach(MessageHandler::start);
+        messageShovels.forEach(MessageShovel::start);
     }
 
     @Override
@@ -112,7 +113,7 @@ public class ShovelDaemon implements Daemon {
 
         logger.info("Stopping...");
 
-        messageHandlers.forEach(MessageHandler::stop);
+        messageShovels.forEach(MessageShovel::stop);
 
         profileManager.stop();
 
@@ -148,16 +149,16 @@ public class ShovelDaemon implements Daemon {
         }
     }
 
-    private void addIncomingMessageHandler() {
+    private void addRemoteRetrievalMessageHandler() {
 
         ConnectionSettings sourceSettings = new Amqp091ConsumerConnectionSettings(
                     "far.incoming",
-                    IncomingMessageHandler.class.getSimpleName(),
+                    AbstractMessageShovel.class.getSimpleName(),
                     profileManager.get() + ".#");
 
         ConnectionSettings destinationSettings = new Amqp091PublisherConnectionSettings(
                     "far.app");
 
-        messageHandlers.add(new IncomingMessageHandler(apiConnectionFactory, sourceSettings, nodeConnectionFactory, destinationSettings));
+        messageShovels.add(new RemoteMessageRetrievalShovel(apiConnectionFactory, sourceSettings, nodeConnectionFactory, destinationSettings));
     }
 }

@@ -1,4 +1,4 @@
-package com.spoohapps.jble6lowpanshoveld.tasks.handlers;
+package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
 import com.spoohapps.jble6lowpanshoveld.model.Message;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class IncomingMessageHandler implements MessageHandler {
+import java.lang.reflect.ParameterizedType;
+
+public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
 
     private ConnectionFactory sourceFactory;
     private ConnectionFactory destinationFactory;
@@ -14,20 +16,26 @@ public class IncomingMessageHandler implements MessageHandler {
     private ConnectionSettings destinationSettings;
 
     private ConsumerConnection consumer;
-    private PublisherConnection publisher;
+    protected PublisherConnection publisher;
 
-    private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
+    private Class<T> subclass;
 
-    public IncomingMessageHandler(ConnectionFactory sourceFactory, ConnectionSettings sourceSettings, ConnectionFactory destinationFactory, ConnectionSettings destinationSettings) {
+    protected final Logger logger;
+
+    protected AbstractMessageShovel(ConnectionFactory sourceFactory, ConnectionSettings sourceSettings, ConnectionFactory destinationFactory, ConnectionSettings destinationSettings) {
         this.sourceFactory = sourceFactory;
         this.destinationFactory = destinationFactory;
         this.sourceSettings = sourceSettings;
         this.destinationSettings = destinationSettings;
+        this.subclass = (Class<T>) ((ParameterizedType) getClass()
+                .getGenericSuperclass()).getActualTypeArguments()[0];
+
+        logger = LoggerFactory.getLogger(subclass);
     }
 
     @Override
     public void start() {
-        logger.info("starting incoming message handler...");
+        logger.info("starting...");
 
         publisher = destinationFactory.newPublisherConnection(destinationSettings);
         publisher.onClosed(() -> logger.info("Destination connection closed"));
@@ -41,6 +49,7 @@ public class IncomingMessageHandler implements MessageHandler {
 
     @Override
     public void stop() {
+        logger.info("stopping...");
         consumer.close();
         publisher.close();
     }
@@ -55,15 +64,5 @@ public class IncomingMessageHandler implements MessageHandler {
         throw new NotImplementedException();
     }
 
-    @Override
-    public void handleMessage(Message message) {
-
-        logger.info("consumed message with topic {}, hops {}", message.getTopic(), message.getHops());
-
-        if (message.getHops() == 0) {
-            Message newMessage = new Message(message.getTopic(), message.getHops()+1, message.getPayload());
-
-            publisher.publish(newMessage);
-        }
-    }
+    protected abstract void handleMessage(Message message);
 }
