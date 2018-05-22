@@ -49,13 +49,13 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
     }
 
     private synchronized void connectionShutdown(String reason) {
-        logger.debug("Shutdown signal \"{}\" + from connection: {}", reason, connection.getName());
+        logger.debug("Shutdown signal from connection: {}", connection.getName());
         connection = null;
         channels.clear();
     }
 
     private synchronized void channelShutdown(Amqp091Connection owner, Amqp091Channel channel, String reason) {
-        logger.debug("Shutdown signal \"{}\" + from channel on connection: {}. total channels = {}", reason, connection.getName(), channels.size());
+        logger.debug("Shutdown signal from channel on connection: {}. total channels = {}", connection.getName(), channels.size());
         channels.remove(channel);
         if (owner == connection && connection != null && channels.size() == 0) {
             logger.info("All channels gone for connection: {}, closing connection.", connection.getName());

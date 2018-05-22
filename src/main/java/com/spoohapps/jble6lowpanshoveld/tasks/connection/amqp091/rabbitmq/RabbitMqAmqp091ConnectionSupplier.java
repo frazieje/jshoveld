@@ -4,6 +4,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091Connection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionSupplier;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
@@ -21,6 +22,16 @@ public class RabbitMqAmqp091ConnectionSupplier implements Amqp091ConnectionSuppl
         connectionFactory.setPassword(password);
         connectionFactory.setHost(host);
         connectionFactory.setPort(port);
+    }
+
+    public RabbitMqAmqp091ConnectionSupplier(ExecutorService executorService, String host, int port, String username, String password, SSLContext sslContext) {
+        this.executorService = executorService;
+        connectionFactory = new ConnectionFactory();
+        connectionFactory.setUsername(username);
+        connectionFactory.setPassword(password);
+        connectionFactory.setHost(host);
+        connectionFactory.setPort(port);
+        connectionFactory.useSslProtocol(sslContext);
     }
 
     @Override

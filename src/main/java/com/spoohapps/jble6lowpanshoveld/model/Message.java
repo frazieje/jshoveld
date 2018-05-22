@@ -20,6 +20,13 @@ public class Message {
         return payload;
     }
 
+
+    public Message(String topic, byte[] payload) {
+        this.topic = topic;
+        this.hops = 0;
+        this.payload = payload;
+    }
+
     public Message(String topic, int hops, byte[] payload) {
         this.topic = topic;
         this.hops = hops;

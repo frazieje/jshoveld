@@ -81,8 +81,8 @@ public class ShovelDaemon implements Daemon {
                 executorService,
                 shovelDaemonConfig.nodeHost(),
                 shovelDaemonConfig.nodePort(),
-                "jble6lowpanshoveld",
-                "jble6lowpanshoveld");
+                "somepassphrase",
+                "somepassphrase");
 
         nodeConnectionFactory = new Amqp091ConnectionFactory(nodeRabbitMqConnectionSupplier);
 
@@ -90,8 +90,8 @@ public class ShovelDaemon implements Daemon {
                 executorService,
                 shovelDaemonConfig.apiHost(),
                 shovelDaemonConfig.apiPort(),
-                "jble6lowpanshoveld",
-                "jble6lowpanshoveld");
+                "somepassphrase",
+                "somepassphrase");
 
         apiConnectionFactory = new Amqp091ConnectionFactory(apiRabbitMqConnectionSupplier);
     }

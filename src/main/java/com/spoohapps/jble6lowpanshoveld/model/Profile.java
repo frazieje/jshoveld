@@ -1,12 +1,11 @@
 package com.spoohapps.jble6lowpanshoveld.model;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
+
 
 public class Profile {
 

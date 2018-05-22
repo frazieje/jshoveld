@@ -38,7 +38,7 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
 
     @Override
     public void open() {
-        logger.info("opening consumer channel");
+        logger.info("opening consumer connection...");
         try {
             channel = channelSupplier.getChannel();
             channel.addShutdownListener(this::handleShutdown);
@@ -46,15 +46,15 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
             channel.queueDeclare(queue);
             channel.queueBind(queue, exchange, routingKey);
             channel.consume(queue, this::consumeInternal, this::handleShutdown);
+            logger.info("consumer connection opened.");
         } catch (IOException | TimeoutException e) {
-            logger.error("Error opening consumer channel: {}", e.getMessage());
+            logger.error("Error opening consumer connection: {}", e.getMessage());
             e.printStackTrace();
             if (channel != null)
                 closeInternal();
             else
                 notifyShutdown();
         }
-        logger.info("consumer channel opened.");
     }
 
     private void consumeInternal(Amqp091Message message) {

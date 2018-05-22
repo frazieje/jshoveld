@@ -52,6 +52,7 @@ public class Amqp091PublisherConnection implements PublisherConnection {
             channel = channelSupplier.getChannel();
             channel.addShutdownListener(this::handleShutdown);
             channel.exchangeDeclare(exchange);
+            logger.info("publisher connection opened");
         } catch (IOException | TimeoutException e) {
             logger.error("Error opening publisher channel: {}", e.getMessage());
             e.printStackTrace();
@@ -61,7 +62,6 @@ public class Amqp091PublisherConnection implements PublisherConnection {
                 notifyShutdown();
             }
         }
-        logger.info("publisher connection opened");
     }
 
     @Override
