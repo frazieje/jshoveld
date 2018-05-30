@@ -1,6 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq;
 
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DefaultSaslConfig;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091Connection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionSupplier;
 
@@ -31,6 +32,15 @@ public class RabbitMqAmqp091ConnectionSupplier implements Amqp091ConnectionSuppl
         connectionFactory.setPassword(password);
         connectionFactory.setHost(host);
         connectionFactory.setPort(port);
+        connectionFactory.useSslProtocol(sslContext);
+    }
+
+    public RabbitMqAmqp091ConnectionSupplier(ExecutorService executorService, String host, int port, SSLContext sslContext) {
+        this.executorService = executorService;
+        connectionFactory = new ConnectionFactory();
+        connectionFactory.setHost(host);
+        connectionFactory.setPort(port);
+        connectionFactory.setSaslConfig(DefaultSaslConfig.EXTERNAL);
         connectionFactory.useSslProtocol(sslContext);
     }
 

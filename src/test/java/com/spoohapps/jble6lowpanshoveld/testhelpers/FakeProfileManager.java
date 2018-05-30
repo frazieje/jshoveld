@@ -11,12 +11,6 @@ public class FakeProfileManager implements ProfileManager {
     private Consumer<Profile> profileConsumer;
 
     public FakeProfileManager() {
-        try {
-            profile = Profile.generate();
-        } catch (Exception e) {
-            e.printStackTrace();
-            profile = null;
-        }
     }
 
     @Override

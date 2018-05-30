@@ -4,6 +4,10 @@ import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.concurrent.TimeUnit;
@@ -41,20 +45,14 @@ public class FileBasedProfileManager implements ProfileManager {
     private void init() {
         profile = getStoredProfile();
         if (profile == null) {
-            try {
-                profile = Profile.generate();
-                logger.info("generated profile id: " + profile.toString());
-                setStoredProfile(profile);
-            } catch (Exception e) {
-                logger.error("could not generate profile: " + e.getMessage());
-            }
+            logger.info("profile null");
+            setStoredProfile(profile);
         } else {
             notifyConsumer(profile);
         }
     }
 
     private synchronized void onFileChanged() {
-        logger.info("filechanged");
         Profile newProfile = getStoredProfile();
         Profile current = currentProfile();
 
@@ -85,7 +83,7 @@ public class FileBasedProfileManager implements ProfileManager {
             if (profile == null) {
                 bytes = "".getBytes();
             } else {
-                bytes = profile.toString().getBytes();
+                bytes = profile.toByteArray();
             }
             Files.write(filePath, bytes);
         } catch (Exception e) {
@@ -95,7 +93,7 @@ public class FileBasedProfileManager implements ProfileManager {
 
     private synchronized Profile getStoredProfile() {
         try {
-            return Profile.from(new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8));
+            return Profile.from(Files.newInputStream(filePath));
         } catch (Exception e) {
             logger.error("error reading profile file: " + e.getMessage());
         }
@@ -112,7 +110,7 @@ public class FileBasedProfileManager implements ProfileManager {
         Profile current = currentProfile();
         if (current == null)
             return null;
-        return Profile.from(current.toString());
+        return Profile.from(new ByteArrayInputStream(current.toByteArray()));
     }
 
     @Override

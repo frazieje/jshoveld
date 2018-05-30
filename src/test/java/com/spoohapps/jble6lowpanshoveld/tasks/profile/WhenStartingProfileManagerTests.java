@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WhenGeneratingProfileTests {
+public class WhenStartingProfileManagerTests {
 
     private ProfileManager profileManager;
 
@@ -41,12 +41,12 @@ public class WhenGeneratingProfileTests {
     }
 
     @Test
-    public void shouldStartWithGeneratedProfile() {
-        assertNotNull(profileManager.get());
+    public void shouldStartWithNullProfile() {
+        assertNull(profileManager.get());
     }
 
     @Test
-    public void shouldWriteGeneratedProfileToFile() {
-        assertEquals(ProfileFileHelper.getFileContents(filePath), profileManager.get());
+    public void shouldWriteEmptyProfileToFile() {
+        assertNull(ProfileFileHelper.getFileContents(filePath));
     }
 }

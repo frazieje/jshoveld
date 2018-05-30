@@ -4,6 +4,7 @@ import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionFactory;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionSupplier;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091PublisherConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
@@ -77,21 +78,21 @@ public class ShovelDaemon implements Daemon {
 
         profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
 
-        RabbitMqAmqp091ConnectionSupplier nodeRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
+        Amqp091ConnectionSupplier nodeRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
                 executorService,
                 shovelDaemonConfig.nodeHost(),
                 shovelDaemonConfig.nodePort(),
-                "somepassphrase",
-                "somepassphrase");
+                "jble6lowpanshoveld",
+                "jble6lowpanshoveld");
 
         nodeConnectionFactory = new Amqp091ConnectionFactory(nodeRabbitMqConnectionSupplier);
 
-        RabbitMqAmqp091ConnectionSupplier apiRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
+        Amqp091ConnectionSupplier apiRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
                 executorService,
                 shovelDaemonConfig.apiHost(),
                 shovelDaemonConfig.apiPort(),
-                "somepassphrase",
-                "somepassphrase");
+                "jble6lowpanshoveld",
+                "jble6lowpanshoveld");
 
         apiConnectionFactory = new Amqp091ConnectionFactory(apiRabbitMqConnectionSupplier);
     }
