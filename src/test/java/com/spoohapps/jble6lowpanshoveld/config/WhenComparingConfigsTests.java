@@ -22,7 +22,7 @@ public class WhenComparingConfigsTests {
                 "-a", "",
                 "-p", "" + 5672,
                 "-l", "" + 5672,
-                "-",
+                "-n", "",
                 "-f", "./profile.conf"
         };
 
