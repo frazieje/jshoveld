@@ -119,6 +119,24 @@ public class Amqp091PublisherConnectionTests {
     }
 
     @Test
+    public void shouldNotifyClosedIfChannelCloseThrowsIOException() throws IOException, TimeoutException {
+        doThrow(new IOException()).when(mockChannel).close();
+        when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
+        connection.open();
+        connection.close();
+        assertTrue(closed);
+    }
+
+    @Test
+    public void shouldNotifyClosedIfChannelCloseThrowsTimeoutException() throws IOException, TimeoutException {
+        doThrow(new TimeoutException()).when(mockChannel).close();
+        when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
+        connection.open();
+        connection.close();
+        assertTrue(closed);
+    }
+
+    @Test
     public void shouldCloseChannel() throws IOException, TimeoutException {
         when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
         connection.open();

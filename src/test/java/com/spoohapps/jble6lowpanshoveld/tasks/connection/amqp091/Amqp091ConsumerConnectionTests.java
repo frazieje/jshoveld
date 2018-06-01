@@ -186,7 +186,7 @@ public class Amqp091ConsumerConnectionTests {
     }
 
     @Test
-    public void shouldClose() throws IOException, TimeoutException {
+    public void shouldNotifyClosed() throws IOException, TimeoutException {
         when(mockChannelSupplier.getChannel()).thenReturn(new FakeNoopAmqp091Channel());
         connection.open();
         connection.close();
@@ -194,7 +194,25 @@ public class Amqp091ConsumerConnectionTests {
     }
 
     @Test
-    public void shouldCloseChannel() throws IOException, TimeoutException {
+    public void shouldNotifyClosedIfChannelCloseThrowsIOException() throws IOException, TimeoutException {
+        doThrow(new IOException()).when(mockChannel).close();
+        when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
+        connection.open();
+        connection.close();
+        assertTrue(closed);
+    }
+
+    @Test
+    public void shouldNotifyClosedIfChannelCloseThrowsTimeoutException() throws IOException, TimeoutException {
+        doThrow(new TimeoutException()).when(mockChannel).close();
+        when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
+        connection.open();
+        connection.close();
+        assertTrue(closed);
+    }
+
+    @Test
+    public void shouldCloseChannelWhenConnectionClosed() throws IOException, TimeoutException {
         when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
         connection.open();
         connection.close();
