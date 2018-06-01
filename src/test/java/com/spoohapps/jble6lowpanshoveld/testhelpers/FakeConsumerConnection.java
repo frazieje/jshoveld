@@ -25,4 +25,9 @@ public class FakeConsumerConnection implements ConsumerConnection {
     public void onConsume(Consumer<Message> messageConsumer) {
 
     }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
 }

@@ -48,4 +48,9 @@ public class FakeNoopAmqp091Channel implements Amqp091Channel {
     public void close() throws IOException, TimeoutException {
         listeners.forEach(l -> l.accept("test"));
     }
+
+    @Override
+    public String getConnectionName() {
+        return null;
+    }
 }

@@ -9,4 +9,5 @@ public interface ConsumerConnection {
     void close();
     void onClosed(Runnable closed);
     void onConsume(Consumer<Message> messageConsumer);
+    String getDescription();
 }

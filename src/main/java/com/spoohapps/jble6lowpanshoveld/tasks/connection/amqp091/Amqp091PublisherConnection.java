@@ -46,6 +46,15 @@ public class Amqp091PublisherConnection implements PublisherConnection {
     }
 
     @Override
+    public String getDescription() {
+        try {
+            return "Publishing to " + channel.getConnectionName();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
     public void open() {
         logger.info("opening publisher connection...");
         try {
@@ -87,6 +96,7 @@ public class Amqp091PublisherConnection implements PublisherConnection {
         } catch (IOException | TimeoutException e) {
             logger.error("Error closing connection: {}", e.getMessage());
             e.printStackTrace();
+            notifyShutdown();
         }
     }
 

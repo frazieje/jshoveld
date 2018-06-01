@@ -37,6 +37,15 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
     }
 
     @Override
+    public String getDescription() {
+        try {
+            return "Consuming from " + channel.getConnectionName();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
     public void open() {
         logger.info("opening consumer connection...");
         try {
@@ -99,6 +108,7 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
         } catch (IOException | TimeoutException e) {
             logger.error("Error closing connection: {}", e.getMessage());
             e.printStackTrace();
+            notifyShutdown();
         }
     }
 

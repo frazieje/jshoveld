@@ -7,4 +7,5 @@ public interface PublisherConnection {
     void close();
     void onClosed(Runnable closed);
     void publish(Message message);
+    String getDescription();
 }

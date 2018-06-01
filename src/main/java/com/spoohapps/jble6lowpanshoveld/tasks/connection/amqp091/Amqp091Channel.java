@@ -13,4 +13,5 @@ public interface Amqp091Channel {
     void queueBind(String queue, String exchange, String routingKey) throws IOException;
     void addShutdownListener(Consumer<String> message);
     void close() throws IOException, TimeoutException;
+    String getConnectionName();
 }

@@ -10,6 +10,11 @@ public class FakePublisherConnection implements PublisherConnection {
     }
 
     @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
     public void open() {
 
     }

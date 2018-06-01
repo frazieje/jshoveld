@@ -76,4 +76,9 @@ public class RabbitMqAmqp091Channel implements Amqp091Channel {
     public void close() throws IOException, TimeoutException {
         sourceChannel.close();
     }
+
+    @Override
+    public String getConnectionName() {
+        return sourceChannel.getConnection().getClientProvidedName();
+    }
 }

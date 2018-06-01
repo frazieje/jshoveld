@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
 
@@ -16,13 +20,18 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     private ConnectionSettings destinationSettings;
 
     private ConsumerConnection consumer;
-    protected PublisherConnection publisher;
+    private PublisherConnection publisher;
+
+    private Runnable stopped;
 
     private Class<T> subclass;
 
-    protected final Logger logger;
+    final Logger logger;
 
-    protected AbstractMessageShovel(ConnectionFactory sourceFactory, ConnectionSettings sourceSettings, ConnectionFactory destinationFactory, ConnectionSettings destinationSettings) {
+    private AtomicBoolean consumerClosed = new AtomicBoolean(false);
+    private AtomicBoolean publisherClosed = new AtomicBoolean(false);
+
+    AbstractMessageShovel(ConnectionFactory sourceFactory, ConnectionSettings sourceSettings, ConnectionFactory destinationFactory, ConnectionSettings destinationSettings) {
         this.sourceFactory = sourceFactory;
         this.destinationFactory = destinationFactory;
         this.sourceSettings = sourceSettings;
@@ -38,12 +47,12 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
         logger.info("starting...");
 
         publisher = destinationFactory.newPublisherConnection(destinationSettings);
-        publisher.onClosed(() -> logger.info("Destination connection closed"));
+        publisher.onClosed(this::publisherClosed);
         publisher.open();
 
         consumer = sourceFactory.newConsumerConnection(sourceSettings);
-        consumer.onClosed(() -> logger.info("Source connection closed"));
-        consumer.onConsume(this::handleMessage);
+        consumer.onClosed(this::consumerClosed);
+        consumer.onConsume(message -> handleMessage(message, publisher));
         consumer.open();
     }
 
@@ -55,14 +64,41 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     }
 
     @Override
-    public int openConnections() {
-        throw new NotImplementedException();
+    public void onStopped(Runnable stopped) {
+        this.stopped = stopped;
+    }
+
+    private void notifyStopped() {
+        if (stopped != null) {
+            stopped.run();
+        }
+    }
+
+    private void publisherClosed() {
+        logger.info("Destination connection closed");
+        publisherClosed.set(true);
+        if (consumerClosed.get())
+            notifyStopped();
+        else
+            consumer.close();
+    }
+
+    private void consumerClosed() {
+        logger.info("Source connection closed");
+        consumerClosed.set(true);
+        if (publisherClosed.get())
+            notifyStopped();
+        else
+            publisher.close();
     }
 
     @Override
-    public int totalConnections() {
-        throw new NotImplementedException();
+    public List<String> getConnectionDescriptions() {
+        List<String> descriptions = new ArrayList<>();
+        descriptions.add(consumer.getDescription());
+        descriptions.add(publisher.getDescription());
+        return descriptions;
     }
 
-    protected abstract void handleMessage(Message message);
+    protected abstract void handleMessage(Message message, PublisherConnection publisher);
 }
