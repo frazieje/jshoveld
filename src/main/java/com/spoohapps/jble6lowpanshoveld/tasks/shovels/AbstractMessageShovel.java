@@ -4,12 +4,9 @@ import com.spoohapps.jble6lowpanshoveld.model.Message;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
