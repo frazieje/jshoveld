@@ -28,11 +28,13 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     private AtomicBoolean consumerClosed = new AtomicBoolean(false);
     private AtomicBoolean publisherClosed = new AtomicBoolean(false);
 
+    @SuppressWarnings("unchecked")
     AbstractMessageShovel(ConnectionFactory sourceFactory, ConnectionSettings sourceSettings, ConnectionFactory destinationFactory, ConnectionSettings destinationSettings) {
         this.sourceFactory = sourceFactory;
         this.destinationFactory = destinationFactory;
         this.sourceSettings = sourceSettings;
         this.destinationSettings = destinationSettings;
+
         this.subclass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
 
