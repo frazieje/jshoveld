@@ -20,7 +20,7 @@ public class WhenWritingProfileToByteArrayTests {
 
     @BeforeAll
     public void setup() throws InvalidKeySpecException, NoSuchAlgorithmException, CertificateException {
-        TLSCredentialContext nodeContext = new TLSCredentialContext();
+        TLSContext nodeContext = new TLSContext();
         nodeContext.setPrivateKey(ProfileFileHelper.nodePrivateKey());
         nodeContext.setCertificate(ProfileFileHelper.nodeCertificate());
         nodeContext.setCaCertificate(ProfileFileHelper.nodeCaCertificate());

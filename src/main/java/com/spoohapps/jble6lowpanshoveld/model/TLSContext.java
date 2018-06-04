@@ -6,21 +6,23 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Arrays;
 
-public class TLSCredentialContext {
+public class TLSContext {
 
     private X509Certificate certificate;
     private RSAPrivateKey privateKey;
     private X509Certificate caCertificate;
 
-    public TLSCredentialContext() {
+    public TLSContext() {
 
     }
 
-    public TLSCredentialContext(X509Certificate certificate, RSAPrivateKey privateKey, X509Certificate caCertificate) {
+    public TLSContext(X509Certificate certificate, RSAPrivateKey privateKey, X509Certificate caCertificate) {
         this.certificate = certificate;
         this.privateKey = privateKey;
         this.caCertificate = caCertificate;
@@ -52,6 +54,56 @@ public class TLSCredentialContext {
 
     public boolean hasValue() {
         return certificate != null && privateKey != null && caCertificate != null;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+
+        if (other == null) {
+            return false;
+        }
+
+        TLSContext otherCtx = (TLSContext)other;
+
+        if (certificate == null) {
+            if (otherCtx.getCertificate() != null) {
+                return false;
+            }
+        } else {
+            try {
+                if (!Arrays.equals(certificate.getEncoded(), otherCtx.getCertificate().getEncoded())) {
+                    return false;
+                }
+            } catch (CertificateEncodingException e) {
+                return false;
+            }
+        }
+
+        if (caCertificate == null) {
+            if (otherCtx.getCaCertificate() != null) {
+                return false;
+            }
+        } else {
+            try {
+                if (!Arrays.equals(caCertificate.getEncoded(), otherCtx.getCaCertificate().getEncoded())) {
+                    return false;
+                }
+            } catch (CertificateEncodingException e) {
+                return false;
+            }
+        }
+
+        if (privateKey == null) {
+            if (otherCtx.getPrivateKey() != null) {
+                return false;
+            }
+        } else {
+            if (!Arrays.equals(privateKey.getEncoded(), otherCtx.getPrivateKey().getEncoded())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public SSLContext toSSLContext() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException {

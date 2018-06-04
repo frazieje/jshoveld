@@ -2,6 +2,8 @@ package com.spoohapps.jble6lowpanshoveld.model;
 
 import sun.security.provider.X509Factory;
 
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,9 +28,9 @@ public class Profile {
 
     private String id;
 
-    private TLSCredentialContext nodeContext = new TLSCredentialContext();
+    private TLSContext nodeContext = new TLSContext();
 
-    private TLSCredentialContext apiContext = new TLSCredentialContext();
+    private TLSContext apiContext = new TLSContext();
 
     private static final String lineSeparator = System.getProperty("line.separator");
 
@@ -36,7 +38,7 @@ public class Profile {
 
     }
 
-    public static Profile from(String id, TLSCredentialContext nodeContext, TLSCredentialContext apiContext) {
+    public static Profile from(String id, TLSContext nodeContext, TLSContext apiContext) {
         Profile p = from(id);
 
         if (nodeContext != null) {
@@ -237,7 +239,7 @@ public class Profile {
         return buf.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    private void writeSection(Base64.Encoder encoder, StringBuilder buf, TLSCredentialContext context, String startDelimiter, String endDelimiter) {
+    private void writeSection(Base64.Encoder encoder, StringBuilder buf, TLSContext context, String startDelimiter, String endDelimiter) {
         if (context.hasValue()) {
             try {
                 String cert = encoder.encodeToString(context.getCertificate().getEncoded());
@@ -296,6 +298,20 @@ public class Profile {
         return (X509Certificate)factory.generateCertificate(new ByteArrayInputStream(certBytes));
     }
 
+    private static String getCommonNameFromCertificate(X509Certificate certificate) {
+        return Stream.of(certificate)
+                .map(cert -> cert.getSubjectX500Principal().getName())
+                .flatMap(name -> {
+                    try {
+                        return new LdapName(name).getRdns().stream()
+                                .filter(rdn -> rdn.getType().equalsIgnoreCase("cn"))
+                                .map(rdn -> rdn.getValue().toString());
+                    } catch (InvalidNameException e) {
+                        return Stream.empty();
+                    }
+                }).collect(Collectors.joining());
+    }
+
     @Override
     public String toString() {
         return new String(toByteArray(), StandardCharsets.UTF_8);
@@ -320,11 +336,11 @@ public class Profile {
         return id;
     }
 
-    public TLSCredentialContext getNodeContext() {
+    public TLSContext getNodeContext() {
         return nodeContext;
     }
 
-    public TLSCredentialContext getApiContext() {
+    public TLSContext getApiContext() {
         return apiContext;
     }
 
