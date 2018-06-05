@@ -106,27 +106,32 @@ public class TLSContext {
         return true;
     }
 
-    public SSLContext toSSLContext() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException {
+    public SSLContext toSSLContext() throws TLSContextException {
 
-        KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(null, "changeit".toCharArray());
-        keystore.setCertificateEntry("cert-alias", certificate);
-        keystore.setKeyEntry("key-alias", privateKey, "changeit".toCharArray(), new Certificate[] { certificate });
+        try {
+            KeyStore keystore = KeyStore.getInstance("JKS");
+            keystore.load(null, "changeit".toCharArray());
+            keystore.setCertificateEntry("cert-alias", certificate);
+            keystore.setKeyEntry("key-alias", privateKey, "changeit".toCharArray(), new Certificate[]{certificate});
 
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 
-        kmf.init(keystore, "changeit".toCharArray());
+            kmf.init(keystore, "changeit".toCharArray());
 
-        KeyStore trustStore = KeyStore.getInstance("JKS");
-        keystore.load(null, "changeit".toCharArray());
-        keystore.setCertificateEntry("cert-alias", caCertificate);
+            KeyStore trustStore = KeyStore.getInstance("JKS");
+            keystore.load(null, "changeit".toCharArray());
+            keystore.setCertificateEntry("cert-alias", caCertificate);
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-        tmf.init(trustStore);
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(trustStore);
 
-        SSLContext c = SSLContext.getInstance("TLSv1.2");
-        c.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+            SSLContext c = SSLContext.getInstance("TLSv1.2");
 
-        return c;
+            c.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+            return c;
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | UnrecoverableKeyException | KeyManagementException e) {
+            throw new TLSContextException(e);
+        }
     }
 }
