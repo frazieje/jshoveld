@@ -2,6 +2,7 @@ package com.spoohapps.jble6lowpanshoveld.model;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.security.*;
@@ -112,20 +113,22 @@ public class TLSContext {
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(null, "changeit".toCharArray());
             keystore.setCertificateEntry("cert-alias", certificate);
-            keystore.setKeyEntry("key-alias", privateKey, "changeit".toCharArray(), new Certificate[]{certificate});
+            keystore.setKeyEntry("key-alias", privateKey, "changeit".toCharArray(), new Certificate[]{ certificate });
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 
             kmf.init(keystore, "changeit".toCharArray());
 
             KeyStore trustStore = KeyStore.getInstance("JKS");
-            keystore.load(null, "changeit".toCharArray());
-            keystore.setCertificateEntry("cert-alias", caCertificate);
+            trustStore.load(null, "changeit".toCharArray());
+            trustStore.setCertificateEntry("cert-alias", caCertificate);
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(trustStore);
 
             SSLContext c = SSLContext.getInstance("TLSv1.2");
+
+            TrustManager[] managers = tmf.getTrustManagers();
 
             c.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
