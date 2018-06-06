@@ -11,11 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
 
-    private ConnectionFactory sourceFactory;
-    private ConnectionFactory destinationFactory;
-    private ConnectionSettings sourceSettings;
-    private ConnectionSettings destinationSettings;
-
     private ConsumerConnection consumer;
     private PublisherConnection publisher;
 
@@ -29,29 +24,27 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     private AtomicBoolean publisherClosed = new AtomicBoolean(false);
 
     @SuppressWarnings("unchecked")
-    AbstractMessageShovel(ConnectionFactory sourceFactory, ConnectionSettings sourceSettings, ConnectionFactory destinationFactory, ConnectionSettings destinationSettings) {
-        this.sourceFactory = sourceFactory;
-        this.destinationFactory = destinationFactory;
-        this.sourceSettings = sourceSettings;
-        this.destinationSettings = destinationSettings;
+    AbstractMessageShovel(ConsumerConnection consumer, PublisherConnection publisher) {
 
         this.subclass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
 
         logger = LoggerFactory.getLogger(subclass);
+
+        this.consumer = consumer;
+        this.publisher = publisher;
+
+        publisher.onClosed(this::publisherClosed);
+
+        consumer.onClosed(this::consumerClosed);
+
+        consumer.onConsume(message -> handleMessage(message, publisher));
     }
 
     @Override
     public void start() {
         logger.info("starting...");
-
-        publisher = destinationFactory.newPublisherConnection(destinationSettings);
-        publisher.onClosed(this::publisherClosed);
         publisher.open();
-
-        consumer = sourceFactory.newConsumerConnection(sourceSettings);
-        consumer.onClosed(this::consumerClosed);
-        consumer.onConsume(message -> handleMessage(message, publisher));
         consumer.open();
     }
 

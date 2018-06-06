@@ -31,23 +31,15 @@ public class ShovelDaemon implements Daemon {
 
     private ProfileManager profileManager;
 
-    private ConnectionFactory nodeConnectionFactory;
-
-    private ConnectionFactory apiConnectionFactory;
-
     private List<MessageShovel> messageShovels = new ArrayList<>();
 
     private final Logger logger = LoggerFactory.getLogger(ShovelDaemon.class);
 
     public ShovelDaemon() {}
 
-    public ShovelDaemon(ShovelDaemonConfig config, ConnectionFactory nodeConnectionFactory, ConnectionFactory apiConnectionFactory, ProfileManager profileManager) {
+    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager) {
 
         shovelDaemonConfig = config;
-
-        this.nodeConnectionFactory = nodeConnectionFactory;
-
-        this.apiConnectionFactory = apiConnectionFactory;
 
         this.profileManager = profileManager;
 
@@ -77,24 +69,6 @@ public class ShovelDaemon implements Daemon {
         logger.info("source port: {}", shovelDaemonConfig.nodePort());
 
         profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
-
-        Amqp091ConnectionSupplier nodeRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
-                executorService,
-                shovelDaemonConfig.nodeHost(),
-                shovelDaemonConfig.nodePort(),
-                "jble6lowpanshoveld",
-                "jble6lowpanshoveld");
-
-        nodeConnectionFactory = new Amqp091ConnectionFactory(nodeRabbitMqConnectionSupplier);
-
-        Amqp091ConnectionSupplier apiRabbitMqConnectionSupplier = new RabbitMqAmqp091ConnectionSupplier(
-                executorService,
-                shovelDaemonConfig.apiHost(),
-                shovelDaemonConfig.apiPort(),
-                "jble6lowpanshoveld",
-                "jble6lowpanshoveld");
-
-        apiConnectionFactory = new Amqp091ConnectionFactory(apiRabbitMqConnectionSupplier);
     }
 
     @Override
@@ -160,6 +134,9 @@ public class ShovelDaemon implements Daemon {
         ConnectionSettings destinationSettings = new Amqp091PublisherConnectionSettings(
                     "far.app");
 
-        messageShovels.add(new RemoteMessageRetrievalShovel(apiConnectionFactory, sourceSettings, nodeConnectionFactory, destinationSettings));
+//        messageShovels.add(
+//                new RemoteMessageRetrievalShovel(
+//                        apiConnectionFactory.newConsumerConnection(sourceSettings),
+//                        nodeConnectionFactory.newPublisherConnection(destinationSettings)));
     }
 }
