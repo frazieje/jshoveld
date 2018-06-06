@@ -18,7 +18,7 @@ public class ShovelDaemonTests {
 
     @BeforeAll
     public void context() {
-        daemon = new ShovelDaemon(new TestConfig(), new FakeConnectionFactory(), new FakeConnectionFactory(), new FakeProfileManager());
+        daemon = new ShovelDaemon(new TestConfig(), new FakeProfileManager());
         try {
             daemon.start();
         } catch (Exception e) {

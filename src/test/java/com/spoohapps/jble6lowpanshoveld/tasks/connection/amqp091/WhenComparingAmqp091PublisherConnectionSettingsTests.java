@@ -6,7 +6,7 @@ import org.junit.jupiter.api.TestInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class WhenComparingAmqp091PublisherConnectionSettings {
+public class WhenComparingAmqp091PublisherConnectionSettingsTests {
 
     private String expectedExchange = "exchange";
 

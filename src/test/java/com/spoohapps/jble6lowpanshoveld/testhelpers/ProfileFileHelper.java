@@ -47,6 +47,18 @@ public class ProfileFileHelper {
         }
     }
 
+    public static X509Certificate certifcateFromPem(Path pemCertPath) throws IOException, CertificateException {
+        String fileContents = new String(Files.readAllBytes(pemCertPath), StandardCharsets.UTF_8);
+        byte[] certificateBytes = parseDERFromPEM(fileContents);
+        return generateCertificateFromDER(certificateBytes);
+    }
+
+    public static RSAPrivateKey privateKeyFromPem(Path pemKeyPath) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException {
+        String fileContents = new String(Files.readAllBytes(pemKeyPath), StandardCharsets.UTF_8);
+        byte[] keyBytes = parseDERFromPEM(fileContents);
+        return generatePrivateKeyFromDER(keyBytes);
+    }
+
     public static InputStream streamWithProfileId(String profileId) {
         return streamOf(getProfileIdContents(profileId));
     }

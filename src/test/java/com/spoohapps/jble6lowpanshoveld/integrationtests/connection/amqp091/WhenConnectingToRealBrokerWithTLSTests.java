@@ -1,6 +1,9 @@
 package com.spoohapps.jble6lowpanshoveld.integrationtests.connection.amqp091;
 
 import com.spoohapps.jble6lowpanshoveld.model.Message;
+import com.spoohapps.jble6lowpanshoveld.model.Profile;
+import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
+import com.spoohapps.jble6lowpanshoveld.model.TLSContextException;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
@@ -9,6 +12,7 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091Connecti
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091PublisherConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
+import com.spoohapps.jble6lowpanshoveld.testhelpers.ProfileFileHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,29 +46,17 @@ public class WhenConnectingToRealBrokerWithTLSTests {
     private final String testTopic = "test.topic";
 
     @BeforeAll
-    public void setup() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
+    public void setup() throws IOException, CertificateException, NoSuchAlgorithmException, InvalidKeySpecException {
         testExecutor = Executors.newFixedThreadPool(3);
 
-        char[] keyPassphrase = "somepassword".toCharArray();
-        KeyStore ks = KeyStore.getInstance("PKCS12");
+        Path certPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "cert.pem");
+        Path keyPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "key.pem");
+        Path cacertPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "cacert.pem");
 
-        Path pkcs12Path = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "spoohappsmqclient.p12");
-        Path trustStorePath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "spoohappsmqca.jks");
-
-        ks.load(Files.newInputStream(pkcs12Path), keyPassphrase);
-
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-        kmf.init(ks, keyPassphrase);
-
-        char[] trustPassphrase = "somepassword".toCharArray();
-        KeyStore tks = KeyStore.getInstance("JKS");
-        tks.load(Files.newInputStream(trustStorePath), trustPassphrase);
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-        tmf.init(tks);
-
-        SSLContext c = SSLContext.getInstance("TLSv1.2");
-        c.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+        TLSContext tlsContext = new TLSContext(
+                ProfileFileHelper.certifcateFromPem(certPath),
+                ProfileFileHelper.privateKeyFromPem(keyPath),
+                ProfileFileHelper.certifcateFromPem(cacertPath));
 
         factory = new Amqp091ConnectionFactory(
                 new RabbitMqAmqp091ConnectionSupplier(
@@ -72,7 +65,7 @@ public class WhenConnectingToRealBrokerWithTLSTests {
                         5671,
                         "jble6lowpanshoveld",
                         "jble6lowpanshoveld",
-                        c
+                        tlsContext
                 ));
 
         ConnectionSettings publisherSettings = new Amqp091PublisherConnectionSettings("TestExchange");
