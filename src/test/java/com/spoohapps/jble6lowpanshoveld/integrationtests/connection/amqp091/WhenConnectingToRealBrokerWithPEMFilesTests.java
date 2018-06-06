@@ -1,9 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.integrationtests.connection.amqp091;
 
 import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
-import com.spoohapps.jble6lowpanshoveld.model.TLSContextException;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
@@ -18,11 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
@@ -34,7 +28,7 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WhenConnectingToRealBrokerWithTLSTests {
+public class WhenConnectingToRealBrokerWithPEMFilesTests {
     private ConnectionFactory factory;
 
     private PublisherConnection publisherConnection;
@@ -50,7 +44,7 @@ public class WhenConnectingToRealBrokerWithTLSTests {
         testExecutor = Executors.newFixedThreadPool(3);
 
         Path certPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "cert.pem");
-        Path keyPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "key.pem");
+        Path keyPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "key8.pem");
         Path cacertPath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "cacert.pem");
 
         TLSContext tlsContext = new TLSContext(
