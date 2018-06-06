@@ -40,17 +40,21 @@ public class Amqp091ConsumerConnectionSettings implements ConnectionSettings {
         this.routingKey = routingKey;
     }
 
-    public enum SettingsKeys {EXCHANGE, QUEUE, ROUTING_KEY}
+    static class SettingsKeys {
+        static final String EXCHANGE = "exchange";
+        static final String QUEUE = "queue";
+        static final String ROUTING_KEY = "routing_key";
+    }
 
     @Override
     public String get(String key) {
 
-        switch (SettingsKeys.valueOf(key.toUpperCase())) {
-            case EXCHANGE:
+        switch (key.toLowerCase()) {
+            case SettingsKeys.EXCHANGE:
                 return exchange;
-            case QUEUE:
+            case SettingsKeys.QUEUE:
                 return queue;
-            case ROUTING_KEY:
+            case SettingsKeys.ROUTING_KEY:
                 return routingKey;
             default:
                 throw new IllegalArgumentException("Unknown settings key was supplied.");

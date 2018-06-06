@@ -29,12 +29,18 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
 
     @Override
     public ConsumerConnection newConsumerConnection(ConnectionSettings settings) {
-        return new Amqp091ConsumerConnection(this::getChannel, settings.get("exchange"), settings.get("queue"), settings.get("routingKey"));
+        return new Amqp091ConsumerConnection(
+                this::getChannel,
+                settings.get(Amqp091ConsumerConnectionSettings.SettingsKeys.EXCHANGE),
+                settings.get(Amqp091ConsumerConnectionSettings.SettingsKeys.QUEUE),
+                settings.get(Amqp091ConsumerConnectionSettings.SettingsKeys.ROUTING_KEY));
     }
 
     @Override
     public PublisherConnection newPublisherConnection(ConnectionSettings settings) {
-        return new Amqp091PublisherConnection(this::getChannel, settings.get("exchange"));
+        return new Amqp091PublisherConnection(
+                this::getChannel,
+                settings.get(Amqp091PublisherConnectionSettings.SettingsKeys.EXCHANGE));
     }
 
     private synchronized Amqp091Channel getChannel() throws IOException, TimeoutException {

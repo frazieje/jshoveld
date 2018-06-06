@@ -18,10 +18,14 @@ public class Amqp091PublisherConnectionSettings implements ConnectionSettings {
         this.exchange = exchange;
     }
 
+    static class SettingsKeys {
+        static final String EXCHANGE = "exchange";
+    }
+
     @Override
     public String get(String key) {
         switch (key.toLowerCase()) {
-            case "exchange":
+            case SettingsKeys.EXCHANGE:
                 return exchange;
             default:
                 throw new IllegalArgumentException("Unknown settings key was supplied.");
