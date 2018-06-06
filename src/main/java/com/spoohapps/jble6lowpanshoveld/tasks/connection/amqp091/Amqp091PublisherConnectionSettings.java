@@ -27,4 +27,22 @@ public class Amqp091PublisherConnectionSettings implements ConnectionSettings {
                 throw new IllegalArgumentException("Unknown settings key was supplied.");
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (!Amqp091PublisherConnectionSettings.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+
+        final Amqp091PublisherConnectionSettings other = (Amqp091PublisherConnectionSettings) obj;
+
+        if (exchange == null ? other.getExchange() != null : !exchange.equals(other.getExchange()))
+            return false;
+
+        return true;
+
+    }
 }

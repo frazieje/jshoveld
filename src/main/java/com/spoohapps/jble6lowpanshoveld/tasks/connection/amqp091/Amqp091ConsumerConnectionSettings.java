@@ -40,17 +40,44 @@ public class Amqp091ConsumerConnectionSettings implements ConnectionSettings {
         this.routingKey = routingKey;
     }
 
+    public enum SettingsKeys {EXCHANGE, QUEUE, ROUTING_KEY}
+
     @Override
     public String get(String key) {
-        switch (key.toLowerCase()) {
-            case "exchange":
+
+        switch (SettingsKeys.valueOf(key.toUpperCase())) {
+            case EXCHANGE:
                 return exchange;
-            case "queue":
+            case QUEUE:
                 return queue;
-            case "routingkey":
+            case ROUTING_KEY:
                 return routingKey;
             default:
                 throw new IllegalArgumentException("Unknown settings key was supplied.");
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (!Amqp091ConsumerConnectionSettings.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+
+        final Amqp091ConsumerConnectionSettings other = (Amqp091ConsumerConnectionSettings) obj;
+
+        if (exchange == null ? other.getExchange() != null : !exchange.equals(other.getExchange()))
+            return false;
+
+        if (queue == null ? other.getQueue() != null : !queue.equals(other.getQueue()))
+            return false;
+
+        if (routingKey == null ? other.getRoutingKey() != null : !routingKey.equals(other.getRoutingKey()))
+            return false;
+
+        return true;
+
     }
 }
