@@ -162,7 +162,7 @@ public class Config implements ShovelDaemonConfig {
             return false;
         }
 
-        final ShovelDaemonConfig other = (ShovelDaemonConfig) obj;
+        final Config other = (Config) obj;
 
         return Arrays.stream(Config.class.getDeclaredFields()).allMatch(declaredField -> {
             try {
