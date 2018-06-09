@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
@@ -81,7 +82,13 @@ public class RabbitMqAmqp091ConnectionSupplier implements Amqp091ConnectionSuppl
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(executorService, host, port, username, password, tlsContext);
+    }
+
+    @Override
     public boolean equals(Object obj) {
+
         if (obj == null)
             return false;
 

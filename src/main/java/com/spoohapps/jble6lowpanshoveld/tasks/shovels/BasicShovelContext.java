@@ -3,6 +3,8 @@ package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 
+import java.util.Objects;
+
 public class BasicShovelContext implements ShovelContext {
 
     private final ConnectionFactory sourceFactory;
@@ -21,6 +23,11 @@ public class BasicShovelContext implements ShovelContext {
         this.destinationSettings = destinationSettings;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(sourceFactory, sourceSettings, destinationFactory, destinationSettings);
+    }
+
     public static ShovelContext from(
             ConnectionFactory sourceFactory,
             ConnectionSettings sourceSettings,
@@ -29,6 +36,7 @@ public class BasicShovelContext implements ShovelContext {
         return new BasicShovelContext(
                 sourceFactory,
                 sourceSettings,
+
                 destinationFactory,
                 destinationSettings);
     }

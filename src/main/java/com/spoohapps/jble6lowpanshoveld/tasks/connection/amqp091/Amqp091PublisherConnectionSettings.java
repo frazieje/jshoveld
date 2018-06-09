@@ -2,6 +2,8 @@ package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091;
 
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 
+import java.util.Objects;
+
 public class Amqp091PublisherConnectionSettings implements ConnectionSettings {
 
     private String exchange;
@@ -30,6 +32,11 @@ public class Amqp091PublisherConnectionSettings implements ConnectionSettings {
             default:
                 throw new IllegalArgumentException("Unknown settings key was supplied.");
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(exchange);
     }
 
     @Override

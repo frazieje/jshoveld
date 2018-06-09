@@ -12,6 +12,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class TLSContext {
 
@@ -72,6 +73,9 @@ public class TLSContext {
             }
         } else {
             try {
+                if (otherCtx.getCertificate() == null) {
+                    return false;
+                }
                 if (!Arrays.equals(certificate.getEncoded(), otherCtx.getCertificate().getEncoded())) {
                     return false;
                 }
@@ -86,6 +90,9 @@ public class TLSContext {
             }
         } else {
             try {
+                if (otherCtx.getCaCertificate() == null) {
+                    return false;
+                }
                 if (!Arrays.equals(caCertificate.getEncoded(), otherCtx.getCaCertificate().getEncoded())) {
                     return false;
                 }
@@ -99,12 +106,34 @@ public class TLSContext {
                 return false;
             }
         } else {
-            if (!Arrays.equals(privateKey.getEncoded(), otherCtx.getPrivateKey().getEncoded())) {
+            if (otherCtx.getPrivateKey() == null) {
                 return false;
             }
+            return Arrays.equals(privateKey.getEncoded(), otherCtx.getPrivateKey().getEncoded());
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int certHash = 7;
+        if (certificate != null) {
+            try {
+                certHash = Arrays.hashCode(certificate.getEncoded());
+            } catch (CertificateEncodingException ignored) {}
+        }
+        int privateKeyHash = 11;
+        if (privateKey != null) {
+            privateKeyHash = Arrays.hashCode(privateKey.getEncoded());
+        }
+        int caCertHash = 31;
+        if (caCertificate != null) {
+            try {
+                caCertHash = Arrays.hashCode(caCertificate.getEncoded());
+            } catch (CertificateEncodingException ignored) {}
+        }
+        return Objects.hash(certHash, privateKeyHash, caCertHash);
     }
 
     public SSLContext toSSLContext() throws TLSContextException {

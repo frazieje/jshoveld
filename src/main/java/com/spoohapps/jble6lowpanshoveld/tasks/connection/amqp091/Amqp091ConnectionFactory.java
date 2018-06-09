@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 public class Amqp091ConnectionFactory implements ConnectionFactory {
@@ -74,6 +75,11 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
                 connection = null;
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(connectionSupplier);
     }
 
     @Override

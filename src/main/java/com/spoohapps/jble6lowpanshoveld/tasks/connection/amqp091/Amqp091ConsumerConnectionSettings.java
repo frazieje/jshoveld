@@ -2,6 +2,8 @@ package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091;
 
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 
+import java.util.Objects;
+
 public class Amqp091ConsumerConnectionSettings implements ConnectionSettings {
 
     private String exchange;
@@ -62,7 +64,13 @@ public class Amqp091ConsumerConnectionSettings implements ConnectionSettings {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(exchange, queue, routingKey);
+    }
+
+    @Override
     public boolean equals(Object obj) {
+
         if (obj == null)
             return false;
 
