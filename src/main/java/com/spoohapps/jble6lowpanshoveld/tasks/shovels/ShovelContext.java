@@ -8,4 +8,5 @@ public interface ShovelContext {
     ConnectionFactory destinationFactory();
     ConnectionSettings sourceSettings();
     ConnectionSettings destinationSettings();
+    MessageShovel createShovel();
 }

@@ -1,6 +1,9 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
+import com.spoohapps.jble6lowpanshoveld.model.Message;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeConnectionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,7 +18,8 @@ public class WhenComparingBasicShovelContextsTests {
             new FakeAlwaysEqualConnectionFactory(),
             new FakeAlwaysEqualConnectionSettings(),
             new FakeAlwaysEqualConnectionFactory(),
-            new FakeAlwaysEqualConnectionSettings());
+            new FakeAlwaysEqualConnectionSettings(),
+            RemoteMessageRetrievalShovel.class);
 
     @Test
     public void shouldEqual() {
@@ -23,7 +27,8 @@ public class WhenComparingBasicShovelContextsTests {
                 new FakeAlwaysEqualConnectionFactory(),
                 new FakeAlwaysEqualConnectionSettings(),
                 new FakeAlwaysEqualConnectionFactory(),
-                new FakeAlwaysEqualConnectionSettings());
+                new FakeAlwaysEqualConnectionSettings(),
+                RemoteMessageRetrievalShovel.class);
 
         assertEquals(ctx, otherCtx);
     }
@@ -34,7 +39,8 @@ public class WhenComparingBasicShovelContextsTests {
                 new FakeAlwaysNotEqualConnectionFactory(),
                 new FakeAlwaysEqualConnectionSettings(),
                 new FakeAlwaysEqualConnectionFactory(),
-                new FakeAlwaysEqualConnectionSettings());
+                new FakeAlwaysEqualConnectionSettings(),
+                RemoteMessageRetrievalShovel.class);
 
         assertNotEquals(ctx, otherCtx);
     }
@@ -45,7 +51,8 @@ public class WhenComparingBasicShovelContextsTests {
                 new FakeAlwaysEqualConnectionFactory(),
                 new FakeAlwaysNotEqualConnectionSettings(),
                 new FakeAlwaysEqualConnectionFactory(),
-                new FakeAlwaysEqualConnectionSettings());
+                new FakeAlwaysEqualConnectionSettings(),
+                RemoteMessageRetrievalShovel.class);
 
         assertNotEquals(ctx, otherCtx);
     }
@@ -56,7 +63,8 @@ public class WhenComparingBasicShovelContextsTests {
                 new FakeAlwaysEqualConnectionFactory(),
                 new FakeAlwaysEqualConnectionSettings(),
                 new FakeAlwaysNotEqualConnectionFactory(),
-                new FakeAlwaysEqualConnectionSettings());
+                new FakeAlwaysEqualConnectionSettings(),
+                RemoteMessageRetrievalShovel.class);
 
         assertNotEquals(ctx, otherCtx);
     }
@@ -67,9 +75,27 @@ public class WhenComparingBasicShovelContextsTests {
                 new FakeAlwaysEqualConnectionFactory(),
                 new FakeAlwaysEqualConnectionSettings(),
                 new FakeAlwaysEqualConnectionFactory(),
-                new FakeAlwaysNotEqualConnectionSettings());
+                new FakeAlwaysNotEqualConnectionSettings(),
+                RemoteMessageRetrievalShovel.class);
 
         assertNotEquals(ctx, otherCtx);
+    }
+
+    @Test
+    public void shouldNotEqualIfShovelImplIsNotEqual() {
+
+    }
+
+    private class FakeShovel extends AbstractMessageShovel<FakeShovel> {
+
+        public FakeShovel(ConsumerConnection consumer, PublisherConnection publisher) {
+            super(consumer, publisher);
+        }
+
+        @Override
+        protected void handleMessage(Message message, PublisherConnection publisher) {
+
+        }
     }
 
     private class FakeAlwaysEqualConnectionFactory extends FakeConnectionFactory {
