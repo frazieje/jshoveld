@@ -4,6 +4,7 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +74,23 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
                 connection = null;
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (!Amqp091ConnectionFactory.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+
+        final Amqp091ConnectionFactory other = (Amqp091ConnectionFactory) obj;
+
+        if (connectionSupplier == null ? other.connectionSupplier != null : !connectionSupplier.equals(other.connectionSupplier))
+            return false;
+
+        return true;
     }
 
 }

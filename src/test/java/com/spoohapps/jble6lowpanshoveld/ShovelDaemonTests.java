@@ -1,13 +1,11 @@
 package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
-import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeProfileManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,7 +72,7 @@ public class ShovelDaemonTests {
 
         @Override
         public ShovelDaemonConfig apply(ShovelDaemonConfig other) {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

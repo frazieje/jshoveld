@@ -1,6 +1,5 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq;
 
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionSupplier;
 import com.spoohapps.jble6lowpanshoveld.testhelpers.ProfileFileHelper;

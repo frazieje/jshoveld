@@ -7,7 +7,6 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091Connection;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,6 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

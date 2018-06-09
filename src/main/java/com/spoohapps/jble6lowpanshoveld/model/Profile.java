@@ -1,7 +1,5 @@
 package com.spoohapps.jble6lowpanshoveld.model;
 
-import sun.security.provider.X509Factory;
-
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.xml.bind.DatatypeConverter;
@@ -363,8 +361,8 @@ public class Profile {
 
     private static final String privateKeyStartDelimiter = "-----BEGIN PRIVATE KEY-----";
     private static final String privateKeyEndDelimiter = "-----END PRIVATE KEY-----";
-    private static final String certificateStartDelimiter = X509Factory.BEGIN_CERT;
-    private static final String certificateEndDelimiter = X509Factory.END_CERT;
+    private static final String certificateStartDelimiter = "-----BEGIN CERTIFICATE-----";
+    private static final String certificateEndDelimiter = "-----END CERTIFICATE-----";
 
     private Map<String, Map.Entry<String, Consumer<String>>> sectionDelimiters =
             Collections.unmodifiableMap(Stream.of(
