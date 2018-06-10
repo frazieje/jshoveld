@@ -20,6 +20,11 @@ public class RemoteMessageRetrievalShovelTests {
 
     private RemoteMessageRetrievalShovel shovel;
 
+    private ConnectionFactory mockSourceFactory;
+    private ConnectionSettings mockSourceSettings;
+    private ConnectionFactory mockDestinationFactory;
+    private ConnectionSettings mockDestinationSettings;
+
     private ConsumerConnection mockConsumerConnection;
     private PublisherConnection mockPublisherConnection;
 
@@ -33,10 +38,24 @@ public class RemoteMessageRetrievalShovelTests {
 
     @BeforeEach
     public void setup() {
+
         mockConsumerConnection = mock(ConsumerConnection.class);
         mockPublisherConnection = mock(PublisherConnection.class);
 
-        shovel = new RemoteMessageRetrievalShovel(mockConsumerConnection, mockPublisherConnection);
+        mockSourceFactory = mock(ConnectionFactory.class);
+        mockSourceSettings = mock(ConnectionSettings.class);
+        mockDestinationFactory = mock(ConnectionFactory.class);
+        mockDestinationSettings = mock(ConnectionSettings.class);
+
+        when(mockSourceFactory.newConsumerConnection(mockSourceSettings)).thenReturn(mockConsumerConnection);
+        when(mockDestinationFactory.newPublisherConnection(mockDestinationSettings)).thenReturn(mockPublisherConnection);
+
+        shovel = new RemoteMessageRetrievalShovel(
+                mockSourceFactory,
+                mockSourceSettings,
+                mockDestinationFactory,
+                mockDestinationSettings);
+
         shovel.start();
     }
 

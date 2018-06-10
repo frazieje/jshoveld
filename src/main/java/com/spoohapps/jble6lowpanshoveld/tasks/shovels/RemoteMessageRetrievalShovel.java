@@ -1,13 +1,19 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
 import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 
 public class RemoteMessageRetrievalShovel extends AbstractMessageShovel<RemoteMessageRetrievalShovel> {
 
-    public RemoteMessageRetrievalShovel(ConsumerConnection consumer, PublisherConnection publisher) {
-        super(consumer, publisher);
+    public RemoteMessageRetrievalShovel(
+            ConnectionFactory sourceFactory,
+            ConnectionSettings sourceSettings,
+            ConnectionFactory destinationFactory,
+            ConnectionSettings destinationSettings
+    ) {
+        super(sourceFactory, sourceSettings, destinationFactory, destinationSettings);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
 import com.spoohapps.jble6lowpanshoveld.model.Message;
+import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -88,8 +88,13 @@ public class WhenComparingBasicShovelContextsTests {
 
     private class FakeShovel extends AbstractMessageShovel<FakeShovel> {
 
-        public FakeShovel(ConsumerConnection consumer, PublisherConnection publisher) {
-            super(consumer, publisher);
+        public FakeShovel(
+                ConnectionFactory sourceFactory,
+                ConnectionSettings sourceSettings,
+                ConnectionFactory destinationFactory,
+                ConnectionSettings destinationSettings
+        ) {
+            super(sourceFactory, sourceSettings, destinationFactory, destinationSettings);
         }
 
         @Override

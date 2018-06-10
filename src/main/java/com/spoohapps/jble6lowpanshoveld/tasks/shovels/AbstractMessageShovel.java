@@ -4,6 +4,9 @@ import com.spoohapps.jble6lowpanshoveld.model.Message;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,19 +23,34 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
     final Logger logger;
 
+    private final ConnectionFactory sourceFactory;
+    private final ConnectionSettings sourceSettings;
+    private final ConnectionFactory destinationFactory;
+    private final ConnectionSettings destinationSettings;
+
     private AtomicBoolean consumerClosed = new AtomicBoolean(false);
     private AtomicBoolean publisherClosed = new AtomicBoolean(false);
 
     @SuppressWarnings("unchecked")
-    AbstractMessageShovel(ConsumerConnection consumer, PublisherConnection publisher) {
+    AbstractMessageShovel(
+            ConnectionFactory sourceFactory,
+            ConnectionSettings sourceSettings,
+            ConnectionFactory destinationFactory,
+            ConnectionSettings destinationSettings
+    ) {
 
         this.subclass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
 
         logger = LoggerFactory.getLogger(subclass);
 
-        this.consumer = consumer;
-        this.publisher = publisher;
+        this.sourceFactory = sourceFactory;
+        this.sourceSettings = sourceSettings;
+        this.destinationFactory = destinationFactory;
+        this.destinationSettings = destinationSettings;
+
+        consumer = sourceFactory.newConsumerConnection(sourceSettings);
+        publisher = destinationFactory.newPublisherConnection(destinationSettings);
 
         publisher.onClosed(this::publisherClosed);
 
@@ -90,6 +108,52 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
         descriptions.add(consumer.getDescription());
         descriptions.add(publisher.getDescription());
         return descriptions;
+    }
+
+    @Override
+    public MessageShovel clone() {
+        try {
+            Constructor<? extends MessageShovel> constructor =
+                    subclass.getConstructor(
+                            ConnectionFactory.class,
+                            ConnectionSettings.class,
+                            ConnectionFactory.class,
+                            ConnectionSettings.class);
+
+            return constructor.newInstance(
+                    sourceFactory,
+                    sourceSettings,
+                    destinationFactory,
+                    destinationSettings);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new RuntimeException("Could not clone shovel", e);
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+
+        if (!subclass.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+
+        final AbstractMessageShovel other = (AbstractMessageShovel) obj;
+
+        if (sourceFactory == null ? other.sourceFactory != null : !sourceFactory.equals(other.sourceFactory))
+            return false;
+
+        if (sourceSettings == null ? other.sourceSettings != null : !sourceSettings.equals(other.sourceSettings))
+            return false;
+
+        if (destinationFactory == null ? other.destinationFactory != null : !destinationFactory.equals(other.destinationFactory))
+            return false;
+
+        if (destinationSettings == null ? other.destinationSettings != null : !destinationSettings.equals(other.destinationSettings))
+            return false;
+
+        return true;
     }
 
     protected abstract void handleMessage(Message message, PublisherConnection publisher);

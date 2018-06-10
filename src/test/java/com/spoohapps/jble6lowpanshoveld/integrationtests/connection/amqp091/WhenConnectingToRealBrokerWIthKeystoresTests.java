@@ -42,7 +42,7 @@ public class WhenConnectingToRealBrokerWIthKeystoresTests {
     public void setup() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
         testExecutor = Executors.newFixedThreadPool(3);
 
-        char[] keyPassphrase = "changeit".toCharArray();
+        char[] keyPassphrase = "YepP48fF".toCharArray();
         KeyStore ks = KeyStore.getInstance("PKCS12");
 
         Path pkcs12Path = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "client", "spoohappsmqclient.p12");
@@ -53,7 +53,7 @@ public class WhenConnectingToRealBrokerWIthKeystoresTests {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
         kmf.init(ks, keyPassphrase);
 
-        char[] trustPassphrase = "changeit".toCharArray();
+        char[] trustPassphrase = "YepP48fF".toCharArray();
         KeyStore tks = KeyStore.getInstance("JKS");
         tks.load(Files.newInputStream(trustStorePath), trustPassphrase);
 

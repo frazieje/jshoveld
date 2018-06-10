@@ -6,6 +6,6 @@ import java.util.Set;
 public interface ShovelManager {
     void start();
     void stop();
-    void setShovels(Set<ShovelContext> shovels);
+    void setShovels(Set<MessageShovel> shovels);
     List<ShovelDescriptor> shovelDescriptors();
 }
