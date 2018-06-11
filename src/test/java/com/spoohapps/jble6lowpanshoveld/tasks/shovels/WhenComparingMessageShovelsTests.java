@@ -1,0 +1,45 @@
+package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
+
+import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeConnectionFactory;
+import com.spoohapps.jble6lowpanshoveld.testhelpers.TestConnectionSettings;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class WhenComparingMessageShovelsTests {
+
+    MessageShovel otherShovel = new RemoteMessageRetrievalShovel(
+            new ShovelContext(
+                new FakeConnectionFactory(),
+                new TestConnectionSettings(),
+                new FakeConnectionFactory(),
+                new TestConnectionSettings()));
+
+    @Test
+    public void shouldEqual() {
+        MessageShovel shovel = new RemoteMessageRetrievalShovel(
+                new ShovelContext(
+                    new FakeConnectionFactory(),
+                    new TestConnectionSettings(),
+                    new FakeConnectionFactory(),
+                    new TestConnectionSettings()));
+
+        assertEquals(shovel, otherShovel);
+    }
+
+    @Test
+    public void shouldNotEqualIfDifferentImpls() {
+        MessageShovel shovel = new SimpleMessageShovel(
+                new ShovelContext(
+                    new FakeConnectionFactory(),
+                    new TestConnectionSettings(),
+                    new FakeConnectionFactory(),
+                    new TestConnectionSettings()));
+
+        assertNotEquals(shovel, otherShovel);
+    }
+
+}

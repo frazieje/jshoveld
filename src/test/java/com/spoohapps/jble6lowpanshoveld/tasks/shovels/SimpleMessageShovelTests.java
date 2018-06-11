@@ -12,13 +12,15 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class RemoteMessageRetrievalShovelTests {
+public class SimpleMessageShovelTests {
 
-    private RemoteMessageRetrievalShovel shovel;
+    private SimpleMessageShovel shovel;
 
     private ConnectionFactory mockSourceFactory;
     private ConnectionSettings mockSourceSettings;
@@ -50,12 +52,12 @@ public class RemoteMessageRetrievalShovelTests {
         when(mockSourceFactory.newConsumerConnection(mockSourceSettings)).thenReturn(mockConsumerConnection);
         when(mockDestinationFactory.newPublisherConnection(mockDestinationSettings)).thenReturn(mockPublisherConnection);
 
-        shovel = new RemoteMessageRetrievalShovel(
+        shovel = new SimpleMessageShovel(
                 new ShovelContext(
-                    mockSourceFactory,
-                    mockSourceSettings,
-                    mockDestinationFactory,
-                    mockDestinationSettings));
+                        mockSourceFactory,
+                        mockSourceSettings,
+                        mockDestinationFactory,
+                        mockDestinationSettings));
 
         shovel.start();
     }
@@ -99,35 +101,4 @@ public class RemoteMessageRetrievalShovelTests {
         Message publishedMessage = publishedMessageCaptor.getValue();
         assertEquals(originalMessage.getTopic(), publishedMessage.getTopic());
     }
-
-    @Test
-    public void shouldPublishMessageWithIncrementedHops() {
-        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
-        messageCaptor.getValue().accept(originalMessage);
-        ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
-        verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
-        Message publishedMessage = publishedMessageCaptor.getValue();
-        assertEquals(originalMessage.getHops()+1, publishedMessage.getHops());
-    }
-
-    @Test
-    public void shouldPublishMessageWithEqualPayload() {
-        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
-        messageCaptor.getValue().accept(originalMessage);
-        ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
-        verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
-        Message publishedMessage = publishedMessageCaptor.getValue();
-        assertEquals(originalMessage.getPayload(), publishedMessage.getPayload());
-    }
-
-    @Test
-    public void shouldNotPublishMessageWithHopsGreaterThanZero() {
-        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 1, new byte[] { 0, 1});
-        messageCaptor.getValue().accept(originalMessage);
-        verify(mockPublisherConnection, times(0)).publish(any());
-    }
-
 }

@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
 
+    private ShovelContext context;
+
     private ConsumerConnection consumer;
     private PublisherConnection publisher;
 
@@ -23,34 +25,21 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
     final Logger logger;
 
-    private final ConnectionFactory sourceFactory;
-    private final ConnectionSettings sourceSettings;
-    private final ConnectionFactory destinationFactory;
-    private final ConnectionSettings destinationSettings;
-
     private AtomicBoolean consumerClosed = new AtomicBoolean(false);
     private AtomicBoolean publisherClosed = new AtomicBoolean(false);
 
     @SuppressWarnings("unchecked")
-    AbstractMessageShovel(
-            ConnectionFactory sourceFactory,
-            ConnectionSettings sourceSettings,
-            ConnectionFactory destinationFactory,
-            ConnectionSettings destinationSettings
-    ) {
+    AbstractMessageShovel(ShovelContext context) {
 
         this.subclass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
 
         logger = LoggerFactory.getLogger(subclass);
 
-        this.sourceFactory = sourceFactory;
-        this.sourceSettings = sourceSettings;
-        this.destinationFactory = destinationFactory;
-        this.destinationSettings = destinationSettings;
+        this.context = context;
 
-        consumer = sourceFactory.newConsumerConnection(sourceSettings);
-        publisher = destinationFactory.newPublisherConnection(destinationSettings);
+        consumer = context.getSourceFactory().newConsumerConnection(context.getSourceSettings());
+        publisher = context.getDestinationFactory().newPublisherConnection(context.getDestinationSettings());
 
         publisher.onClosed(this::publisherClosed);
 
@@ -113,18 +102,9 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     @Override
     public MessageShovel clone() {
         try {
-            Constructor<? extends MessageShovel> constructor =
-                    subclass.getConstructor(
-                            ConnectionFactory.class,
-                            ConnectionSettings.class,
-                            ConnectionFactory.class,
-                            ConnectionSettings.class);
-
-            return constructor.newInstance(
-                    sourceFactory,
-                    sourceSettings,
-                    destinationFactory,
-                    destinationSettings);
+            Constructor<? extends AbstractMessageShovel> constructor =
+                    subclass.getConstructor(ShovelContext.class);
+            return constructor.newInstance(context);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new RuntimeException("Could not clone shovel", e);
         }
@@ -141,16 +121,7 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
         final AbstractMessageShovel other = (AbstractMessageShovel) obj;
 
-        if (sourceFactory == null ? other.sourceFactory != null : !sourceFactory.equals(other.sourceFactory))
-            return false;
-
-        if (sourceSettings == null ? other.sourceSettings != null : !sourceSettings.equals(other.sourceSettings))
-            return false;
-
-        if (destinationFactory == null ? other.destinationFactory != null : !destinationFactory.equals(other.destinationFactory))
-            return false;
-
-        if (destinationSettings == null ? other.destinationSettings != null : !destinationSettings.equals(other.destinationSettings))
+        if (context == null ? other.context != null : !context.equals(other.context))
             return false;
 
         return true;
