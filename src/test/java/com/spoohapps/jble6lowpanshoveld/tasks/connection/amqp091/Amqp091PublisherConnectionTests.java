@@ -109,6 +109,16 @@ public class Amqp091PublisherConnectionTests {
     }
 
     @Test
+    public void shouldPublishMessageWithDeviceAsHeader() throws IOException, TimeoutException {
+        when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
+        connection.open();
+        Message testMessage = new Message("some.topic", 0, true, new byte[] { 1, 0 });
+        connection.publish(testMessage);
+        verify(mockChannel).publish(eq(expectedExchange), eq(testMessage.getTopic()), captor.capture(), eq(testMessage.getPayload()));
+        assertTrue(captor.getValue().containsKey("x-device"));
+    }
+
+    @Test
     public void shouldCloseIfPublishFails() throws IOException, TimeoutException {
         when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
         doThrow(new IOException()).when(mockChannel).publish(any(), any(), any(), any());

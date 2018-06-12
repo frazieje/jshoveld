@@ -13,14 +13,13 @@ import org.mockito.MockitoAnnotations;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SimpleMessageShovelTests {
+public class ZeroHopsMessageShovelTests {
 
-    private SimpleMessageShovel shovel;
+    private ZeroHopsMessageShovel shovel;
 
     private ConnectionFactory mockSourceFactory;
     private ConnectionSettings mockSourceSettings;
@@ -52,7 +51,7 @@ public class SimpleMessageShovelTests {
         when(mockSourceFactory.newConsumerConnection(mockSourceSettings)).thenReturn(mockConsumerConnection);
         when(mockDestinationFactory.newPublisherConnection(mockDestinationSettings)).thenReturn(mockPublisherConnection);
 
-        shovel = new SimpleMessageShovel(
+        shovel = new ZeroHopsMessageShovel(
                 new ShovelContext(
                         mockSourceFactory,
                         mockSourceSettings,
@@ -67,7 +66,6 @@ public class SimpleMessageShovelTests {
         shovel.stop();
         shovel = null;
     }
-
 
     @Test
     public void shouldOpenPublisherConnectionWhenStarted() {
@@ -111,6 +109,14 @@ public class SimpleMessageShovelTests {
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
         Message publishedMessage = publishedMessageCaptor.getValue();
         assertEquals(originalMessage.getPayload(), publishedMessage.getPayload());
+    }
+
+    @Test
+    public void shouldNotPublishMessageWithHopsGreaterThanZero() {
+        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
+        Message originalMessage = new Message("topic", 1, new byte[] { 0, 1});
+        messageCaptor.getValue().accept(originalMessage);
+        verify(mockPublisherConnection, times(0)).publish(any());
     }
 
 }

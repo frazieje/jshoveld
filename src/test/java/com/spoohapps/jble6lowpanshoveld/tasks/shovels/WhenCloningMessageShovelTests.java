@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WhenCloningMessageShovelTests {
 
-    MessageShovel original = new RemoteMessageRetrievalShovel(
+    MessageShovel original = new HopsIncrementingMessageShovel(
             new ShovelContext(
                 new FakeConnectionFactory(),
                 new TestConnectionSettings(),

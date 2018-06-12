@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
@@ -108,6 +109,11 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new RuntimeException("Could not clone shovel", e);
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(context, subclass);
     }
 
     @Override

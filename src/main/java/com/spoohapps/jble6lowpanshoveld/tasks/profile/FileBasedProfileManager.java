@@ -58,8 +58,10 @@ public class FileBasedProfileManager implements ProfileManager {
 
         if (current != null) {
             if (!current.equals(newProfile)) {
-                profile = newProfile;
-                notifyConsumer(newProfile);
+                if (newProfile != null) {
+                    profile = newProfile;
+                    notifyConsumer(newProfile);
+                }
             }
         } else if (newProfile != null) {
             profile = newProfile;

@@ -166,6 +166,19 @@ public class Amqp091ConsumerConnectionTests {
     }
 
     @Test
+    public void shouldConsumeDeviceHeader() throws IOException, TimeoutException {
+        when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
+        connection.open();
+        verify(mockChannel).consume(any(), messageCaptor.capture(), any());
+        Amqp091Message mockMessage = mock(Amqp091Message.class);
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("x-device", "1");
+        when(mockMessage.getHeaders()).thenReturn(headers);
+        messageCaptor.getValue().accept(mockMessage);
+        assertTrue(consumedMessage.isFromDevice());
+    }
+
+    @Test
     public void shouldConsumeMessageBody() throws IOException, TimeoutException {
         when(mockChannelSupplier.getChannel()).thenReturn(mockChannel);
         connection.open();

@@ -79,7 +79,12 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
             }
         }
 
-        Message newMessage = new Message(message.getRoutingKey(), hops, message.getBody());
+        boolean fromDevice = false;
+        if (headers.containsKey("x-device")) {
+            fromDevice = true;
+        }
+
+        Message newMessage = new Message(message.getRoutingKey(), hops, fromDevice, message.getBody());
 
         if (messageConsumer != null)
             messageConsumer.accept(newMessage);

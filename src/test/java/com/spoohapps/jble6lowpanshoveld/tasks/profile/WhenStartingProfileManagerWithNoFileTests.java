@@ -12,32 +12,30 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WhenStartingProfileManagerTests {
+public class WhenStartingProfileManagerWithNoFileTests {
 
     private ProfileManager profileManager;
 
     private Path filePath = Paths.get(System.getProperty("user.home"), "profile.conf");
 
-    private Profile currentProfile;
+    private Profile currentProfile = Profile.from("adbc1234");
 
     @BeforeAll
     public void context() {
+        ProfileFileHelper.deleteFile(filePath);
         profileManager = new FileBasedProfileManager(filePath);
-        try {
-            profileManager.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        profileManager.onChanged(this::setProfile);
+        profileManager.start();
     }
 
     @AfterAll
     public void teardown() {
-        try {
-            profileManager.stop();
-            Files.delete(filePath);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        profileManager.stop();
+        ProfileFileHelper.deleteFile(filePath);
+    }
+
+    private void setProfile(Profile profile) {
+        currentProfile = profile;
     }
 
     @Test
@@ -48,5 +46,10 @@ public class WhenStartingProfileManagerTests {
     @Test
     public void shouldWriteEmptyProfileToFile() {
         assertNull(ProfileFileHelper.getFileContents(filePath));
+    }
+
+    @Test
+    public void shouldNotNotifyObserversOfNullProfile() {
+        assertNotNull(currentProfile);
     }
 }

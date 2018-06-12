@@ -2,6 +2,7 @@ package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeProfileManager;
+import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeShovelManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ public class ShovelDaemonTests {
 
     @BeforeAll
     public void context() {
-        daemon = new ShovelDaemon(new TestConfig(), new FakeProfileManager());
+        daemon = new ShovelDaemon(new TestConfig(), new FakeProfileManager(), new FakeShovelManager());
         try {
             daemon.start();
         } catch (Exception e) {

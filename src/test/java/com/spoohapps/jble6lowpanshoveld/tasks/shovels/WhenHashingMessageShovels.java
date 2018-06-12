@@ -9,37 +9,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WhenComparingMessageShovelsTests {
+public class WhenHashingMessageShovels {
 
     MessageShovel otherShovel = new HopsIncrementingMessageShovel(
             new ShovelContext(
-                new FakeConnectionFactory(),
-                new TestConnectionSettings(),
-                new FakeConnectionFactory(),
-                new TestConnectionSettings()));
-
-    @Test
-    public void shouldEqual() {
-        MessageShovel shovel = new HopsIncrementingMessageShovel(
-                new ShovelContext(
                     new FakeConnectionFactory(),
                     new TestConnectionSettings(),
                     new FakeConnectionFactory(),
                     new TestConnectionSettings()));
 
-        assertEquals(shovel, otherShovel);
+    @Test
+    public void shouldHaveSameResult() {
+        MessageShovel shovel = new HopsIncrementingMessageShovel(
+                new ShovelContext(
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(),
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings()));
+
+        assertEquals(shovel.hashCode(), otherShovel.hashCode());
     }
 
     @Test
-    public void shouldNotEqualIfDifferentImpls() {
+    public void shouldHaveDifferentResultForDifferentImpl() {
         MessageShovel shovel = new SimpleMessageShovel(
                 new ShovelContext(
-                    new FakeConnectionFactory(),
-                    new TestConnectionSettings(),
-                    new FakeConnectionFactory(),
-                    new TestConnectionSettings()));
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(),
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings()));
 
-        assertNotEquals(shovel, otherShovel);
+        assertNotEquals(shovel.hashCode(), otherShovel.hashCode());
     }
 
 }

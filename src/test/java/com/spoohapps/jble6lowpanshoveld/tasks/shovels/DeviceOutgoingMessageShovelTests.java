@@ -12,13 +12,14 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class RemoteMessageRetrievalShovelTests {
+public class DeviceOutgoingMessageShovelTests {
 
-    private RemoteMessageRetrievalShovel shovel;
+    private MessageShovel shovel;
 
     private ConnectionFactory mockSourceFactory;
     private ConnectionSettings mockSourceSettings;
@@ -27,6 +28,8 @@ public class RemoteMessageRetrievalShovelTests {
 
     private ConsumerConnection mockConsumerConnection;
     private PublisherConnection mockPublisherConnection;
+
+    private String expectedProfileId = "1a2b3c4d";
 
     @Captor
     private ArgumentCaptor<Consumer<Message>> messageCaptor;
@@ -50,12 +53,13 @@ public class RemoteMessageRetrievalShovelTests {
         when(mockSourceFactory.newConsumerConnection(mockSourceSettings)).thenReturn(mockConsumerConnection);
         when(mockDestinationFactory.newPublisherConnection(mockDestinationSettings)).thenReturn(mockPublisherConnection);
 
-        shovel = new RemoteMessageRetrievalShovel(
+        shovel = new DeviceOutgoingMessageShovel(
                 new ShovelContext(
-                    mockSourceFactory,
-                    mockSourceSettings,
-                    mockDestinationFactory,
-                    mockDestinationSettings));
+                        mockSourceFactory,
+                        mockSourceSettings,
+                        mockDestinationFactory,
+                        mockDestinationSettings),
+                expectedProfileId);
 
         shovel.start();
     }
@@ -90,31 +94,20 @@ public class RemoteMessageRetrievalShovelTests {
     }
 
     @Test
-    public void shouldPublishMessageWithEqualTopic() {
+    public void shouldPublishMessageWithTrimmedTopic() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
+        Message originalMessage = new Message(expectedProfileId + ".topic", 0, new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
         Message publishedMessage = publishedMessageCaptor.getValue();
-        assertEquals(originalMessage.getTopic(), publishedMessage.getTopic());
-    }
-
-    @Test
-    public void shouldPublishMessageWithIncrementedHops() {
-        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
-        messageCaptor.getValue().accept(originalMessage);
-        ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
-        verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
-        Message publishedMessage = publishedMessageCaptor.getValue();
-        assertEquals(originalMessage.getHops()+1, publishedMessage.getHops());
+        assertEquals("topic", publishedMessage.getTopic());
     }
 
     @Test
     public void shouldPublishMessageWithEqualPayload() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
+        Message originalMessage = new Message(expectedProfileId + ".topic", 0, new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
@@ -123,9 +116,17 @@ public class RemoteMessageRetrievalShovelTests {
     }
 
     @Test
-    public void shouldNotPublishMessageWithHopsGreaterThanZero() {
+    public void shouldNotPublishMessagePublishedFromDevice() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 1, new byte[] { 0, 1});
+        Message originalMessage = new Message(expectedProfileId + ".topic", true, new byte[] { 0, 1});
+        messageCaptor.getValue().accept(originalMessage);
+        verify(mockPublisherConnection, times(0)).publish(any());
+    } 
+
+    @Test
+    public void shouldNotPublishMessageWithoutProfileId() {
+        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
+        Message originalMessage = new Message("topic", new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         verify(mockPublisherConnection, times(0)).publish(any());
     }

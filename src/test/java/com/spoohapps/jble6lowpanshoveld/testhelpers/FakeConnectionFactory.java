@@ -5,6 +5,8 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 
+import java.util.Objects;
+
 public class FakeConnectionFactory implements ConnectionFactory {
 
     @Override
@@ -15,6 +17,11 @@ public class FakeConnectionFactory implements ConnectionFactory {
     @Override
     public PublisherConnection newPublisherConnection(ConnectionSettings settings) {
         return new FakePublisherConnection();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(7);
     }
 
     @Override

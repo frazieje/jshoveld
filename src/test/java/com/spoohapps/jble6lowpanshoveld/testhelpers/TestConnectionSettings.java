@@ -4,6 +4,7 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class TestConnectionSettings implements ConnectionSettings {
 
@@ -29,6 +30,12 @@ public class TestConnectionSettings implements ConnectionSettings {
     public String get(String key) {
         return values.get(key);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
+    }
+
 
     @Override
     public boolean equals(Object obj) {

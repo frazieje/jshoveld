@@ -13,14 +13,15 @@ import org.mockito.MockitoAnnotations;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SimpleMessageShovelTests {
+public class DeviceIncomingMessageShovelTests {
 
-    private SimpleMessageShovel shovel;
+    private MessageShovel shovel;
 
     private ConnectionFactory mockSourceFactory;
     private ConnectionSettings mockSourceSettings;
@@ -29,6 +30,8 @@ public class SimpleMessageShovelTests {
 
     private ConsumerConnection mockConsumerConnection;
     private PublisherConnection mockPublisherConnection;
+
+    private String expectedProfileId = "1a2b3c4d";
 
     @Captor
     private ArgumentCaptor<Consumer<Message>> messageCaptor;
@@ -52,12 +55,13 @@ public class SimpleMessageShovelTests {
         when(mockSourceFactory.newConsumerConnection(mockSourceSettings)).thenReturn(mockConsumerConnection);
         when(mockDestinationFactory.newPublisherConnection(mockDestinationSettings)).thenReturn(mockPublisherConnection);
 
-        shovel = new SimpleMessageShovel(
+        shovel = new DeviceIncomingMessageShovel(
                 new ShovelContext(
                         mockSourceFactory,
                         mockSourceSettings,
                         mockDestinationFactory,
-                        mockDestinationSettings));
+                        mockDestinationSettings),
+                expectedProfileId);
 
         shovel.start();
     }
@@ -92,14 +96,14 @@ public class SimpleMessageShovelTests {
     }
 
     @Test
-    public void shouldPublishMessageWithEqualTopic() {
+    public void shouldPublishMessageWithEqualPrependedTopic() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
         Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
         Message publishedMessage = publishedMessageCaptor.getValue();
-        assertEquals(originalMessage.getTopic(), publishedMessage.getTopic());
+        assertEquals(expectedProfileId + "." + originalMessage.getTopic(), publishedMessage.getTopic());
     }
 
     @Test
@@ -111,6 +115,17 @@ public class SimpleMessageShovelTests {
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
         Message publishedMessage = publishedMessageCaptor.getValue();
         assertEquals(originalMessage.getPayload(), publishedMessage.getPayload());
+    }
+
+    @Test
+    public void shouldPublishMessageWithDeviceHeader() {
+        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
+        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
+        messageCaptor.getValue().accept(originalMessage);
+        ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
+        verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
+        Message publishedMessage = publishedMessageCaptor.getValue();
+        assertTrue(publishedMessage.isFromDevice());
     }
 
 }
