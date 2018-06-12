@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WhenHashingMessageShovels {
+public class WhenHashingMessageShovelsTests {
 
     MessageShovel otherShovel = new HopsIncrementingMessageShovel(
             new ShovelContext(

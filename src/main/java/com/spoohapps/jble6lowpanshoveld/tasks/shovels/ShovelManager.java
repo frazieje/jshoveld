@@ -7,5 +7,5 @@ public interface ShovelManager {
     void start();
     void stop();
     void setShovels(Set<MessageShovel> shovels);
-    List<ShovelDescriptor> shovelDescriptors();
+    List<String> shovelDescriptors();
 }

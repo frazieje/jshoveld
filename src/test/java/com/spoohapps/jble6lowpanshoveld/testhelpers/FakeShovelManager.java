@@ -1,7 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.testhelpers;
 
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
-import com.spoohapps.jble6lowpanshoveld.tasks.shovels.ShovelDescriptor;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.ShovelManager;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class FakeShovelManager implements ShovelManager {
     }
 
     @Override
-    public List<ShovelDescriptor> shovelDescriptors() {
+    public List<String> shovelDescriptors() {
         return null;
     }
 }
