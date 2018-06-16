@@ -2,48 +2,50 @@ package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
+import com.spoohapps.jble6lowpanshoveld.model.Profile;
+import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionFactory;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionSupplier;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091PublisherConnectionSettings;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
-import com.spoohapps.jble6lowpanshoveld.tasks.shovels.AbstractMessageShovel;
-import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
+import com.spoohapps.jble6lowpanshoveld.tasks.shovels.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
-import com.spoohapps.jble6lowpanshoveld.tasks.shovels.RemoteMessageRetrievalShovel;
 import org.apache.commons.daemon.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.*;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ShovelDaemon implements Daemon {
 
-    private ExecutorService executorService;
+    private ScheduledExecutorService executorService;
     private ShovelDaemonConfig shovelDaemonConfig;
 
     private ProfileManager profileManager;
 
-    private List<MessageShovel> messageShovels = new ArrayList<>();
+    private ShovelManager shovelManager;
 
     private final Logger logger = LoggerFactory.getLogger(ShovelDaemon.class);
 
     public ShovelDaemon() {}
 
-    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager) {
+    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager, ShovelManager shovelManager) {
 
         shovelDaemonConfig = config;
 
         this.profileManager = profileManager;
 
-        executorService = Executors.newFixedThreadPool(10);
+        this.shovelManager = shovelManager;
+
+        executorService = Executors.newScheduledThreadPool(10);
+
+        this.profileManager.onChanged(this::setProfile);
     }
 
     public ShovelDaemon(String[] args) {
@@ -63,12 +65,16 @@ public class ShovelDaemon implements Daemon {
 
     private void initialize() {
 
-        executorService = Executors.newFixedThreadPool(10);
+        executorService = Executors.newScheduledThreadPool(10);
 
         logger.info("source host: {}", shovelDaemonConfig.nodeHost());
         logger.info("source port: {}", shovelDaemonConfig.nodePort());
 
+        shovelManager = new AutomaticRestartingShovelManager(executorService, 5000);
+
         profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
+
+        profileManager.onChanged(this::setProfile);
     }
 
     @Override
@@ -76,11 +82,9 @@ public class ShovelDaemon implements Daemon {
 
         logger.info("Starting...");
 
+        shovelManager.start();
+
         profileManager.start();
-
-        addRemoteRetrievalMessageHandler();
-
-        messageShovels.forEach(MessageShovel::start);
     }
 
     @Override
@@ -88,9 +92,9 @@ public class ShovelDaemon implements Daemon {
 
         logger.info("Stopping...");
 
-        messageShovels.forEach(MessageShovel::stop);
-
         profileManager.stop();
+
+        shovelManager.stop();
 
         executorService.shutdown();
         try {
@@ -124,19 +128,123 @@ public class ShovelDaemon implements Daemon {
         }
     }
 
-    private void addRemoteRetrievalMessageHandler() {
+    private void setProfile(Profile newProfile) {
+        Set<MessageShovel> shovels = new HashSet<>();
 
-        ConnectionSettings sourceSettings = new Amqp091ConsumerConnectionSettings(
-                    "far.incoming",
-                    AbstractMessageShovel.class.getSimpleName(),
-                    profileManager.get() + ".#");
+        TLSContext nodeContext = newProfile.getNodeContext();
 
-        ConnectionSettings destinationSettings = new Amqp091PublisherConnectionSettings(
-                    "far.app");
+        if (nodeContext != null && nodeContext.hasValue()) {
 
-//        messageShovels.add(
-//                new RemoteMessageRetrievalShovel(
-//                        apiConnectionFactory.newConsumerConnection(sourceSettings),
-//                        nodeConnectionFactory.newPublisherConnection(destinationSettings)));
+            ConnectionFactory nodeFactory = createAmqp091ConnectionFactory(
+                    shovelDaemonConfig.nodeHost(),
+                    shovelDaemonConfig.nodePort(),
+                    nodeContext);
+
+            shovels.add(getDeviceIncomingShovel(nodeFactory, nodeFactory, newProfile.getId()));
+
+            shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, newProfile.getId()));
+
+            shovels.add(getAppIncomingShovel(nodeFactory, nodeFactory));
+
+            shovels.add(getAppOutgoingShovel(nodeFactory, nodeFactory));
+
+            TLSContext apiContext = newProfile.getApiContext();
+
+            if (apiContext != null && apiContext.hasValue()) {
+
+                ConnectionFactory apiFactory = createAmqp091ConnectionFactory(
+                        shovelDaemonConfig.apiHost(),
+                        shovelDaemonConfig.apiPort(),
+                        apiContext);
+
+                shovels.add(getRemoteShovel(nodeFactory, apiFactory, newProfile.getId()));
+
+                shovels.add(getRemoteShovel(apiFactory, nodeFactory, newProfile.getId()));
+            }
+        }
+
+        shovelManager.setShovels(shovels);
     }
+
+    private Amqp091ConnectionFactory createAmqp091ConnectionFactory(String host, int port, TLSContext context) {
+        return new Amqp091ConnectionFactory(
+                new RabbitMqAmqp091ConnectionSupplier(
+                        executorService,
+                        host,
+                        port,
+                        context));
+    }
+
+    private MessageShovel getDeviceIncomingShovel(ConnectionFactory sourcefactory, ConnectionFactory destinationFactory, String profileId) {
+        return new DeviceIncomingMessageShovel(
+                new ShovelContext(
+                        sourcefactory,
+                        new Amqp091ConsumerConnectionSettings(
+                                "amq.topic",
+                                "DeviceIncomingMessageShovel",
+                                "#"),
+                        destinationFactory,
+                        new Amqp091PublisherConnectionSettings(
+                                "far.app"
+                        )),
+                profileId);
+    }
+
+    private MessageShovel getDeviceOutgoingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory, String profileId) {
+        return new DeviceOutgoingMessageShovel(
+                new ShovelContext(
+                        sourceFactory,
+                        new Amqp091ConsumerConnectionSettings(
+                                "far.app",
+                                "DeviceOutgoingMessageShovel",
+                                "#"),
+                        destinationFactory,
+                        new Amqp091PublisherConnectionSettings(
+                            "amq.topic"
+                        )),
+                profileId);
+    }
+
+    private MessageShovel getAppIncomingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory) {
+        return new HopsIncrementingMessageShovel(
+                new ShovelContext(
+                        sourceFactory,
+                        new Amqp091ConsumerConnectionSettings(
+                                "far.incoming",
+                                "AppIncomingMessageShovel",
+                                "#"),
+                        destinationFactory,
+                        new Amqp091PublisherConnectionSettings(
+                                "far.app"
+                        )));
+    }
+
+    private MessageShovel getAppOutgoingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory) {
+        return new ZeroHopsMessageShovel(
+                new ShovelContext(
+                        sourceFactory,
+                        new Amqp091ConsumerConnectionSettings(
+                                "far.app",
+                                "AppOutgoingMessageShovel",
+                                "#"),
+                        destinationFactory,
+                        new Amqp091PublisherConnectionSettings(
+                                "far.outgoing"
+                        )));
+    }
+
+    private MessageShovel getRemoteShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory, String profileId) {
+        return new SimpleMessageShovel(
+                new ShovelContext(
+                        sourceFactory,
+                        new Amqp091ConsumerConnectionSettings(
+                                "far.outgoing",
+                                "ApiMessageShovel",
+                                profileId + ".#"),
+                        destinationFactory,
+                        new Amqp091PublisherConnectionSettings(
+                                "far.incoming"
+                        )));
+    }
+
 }
