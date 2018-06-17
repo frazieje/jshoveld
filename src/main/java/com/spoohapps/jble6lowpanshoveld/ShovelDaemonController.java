@@ -1,4 +1,4 @@
-package com.spoohapps.jble6lowpanshoveld.tasks;
+package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.model.Profile;
 

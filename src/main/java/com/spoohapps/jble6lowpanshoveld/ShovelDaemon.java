@@ -4,7 +4,6 @@ import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
-import com.spoohapps.jble6lowpanshoveld.tasks.ShovelDaemonController;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;

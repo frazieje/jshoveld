@@ -2,6 +2,7 @@ package com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq;
 
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultSaslConfig;
+import com.rabbitmq.client.SaslConfig;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContextException;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091Connection;
@@ -9,6 +10,7 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091Connecti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.security.sasl.Sasl;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -61,6 +63,9 @@ public class RabbitMqAmqp091ConnectionSupplier implements Amqp091ConnectionSuppl
 
             if (password != null)
                 connectionFactory.setPassword(password);
+
+            if (username == null && password == null)
+                connectionFactory.setSaslConfig(DefaultSaslConfig.EXTERNAL);
 
             connectionFactory.setHost(host);
             connectionFactory.setPort(port);

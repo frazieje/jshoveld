@@ -42,6 +42,9 @@ CLASS_PATH="$JAR_PATH:$GRADLE_CLASS_PATH"
 # The fully qualified name of the class to execute
 CLASS="com.spoohapps.jble6lowpanshoveld.ShovelDaemon"
 
+# The fully qualified name of the cli class
+CLI_CLASS="com.spoohapps.jble6lowpanshoveld.controller.CommandLineShovelDaemonController"
+
 # Any command line arguments to be passed to the our Java Daemon implementations init() method 
 ARGS="-configFile $FILE_PATH/jble6lowpanshoveld.conf -f $FILE_PATH/profile.conf"
 
@@ -58,6 +61,12 @@ jsvc_exec()
 {   
     cd $FILE_PATH
     $EXEC -home $JAVA_HOME -cp $CLASS_PATH -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS $ARGS
+}
+
+cli_exec()
+{
+    cd $FILE_PATH
+    $CLI_EXEC -cp $CLASS_PATH $CLI_CLASS $1
 }
 
 case "$1" in
@@ -93,6 +102,14 @@ case "$1" in
             echo "Daemon not running, no action taken"
             exit 1
         fi
+    ;;
+    status)
+       if [ -f "$PID" ]; then
+            echo "Shovel Daemon Status..."
+            cli_exec "-status"
+       else
+            echo "jble6lowpanshoveld not running"
+       fi
     ;;
     *)
         echo "Usage: /etc/init.d/$NAME {start|stop|restart}" >&2
