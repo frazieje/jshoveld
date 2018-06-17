@@ -4,6 +4,7 @@ import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
+import com.spoohapps.jble6lowpanshoveld.tasks.ShovelDaemonController;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionFactory;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
@@ -16,13 +17,14 @@ import org.apache.commons.daemon.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ShovelDaemon implements Daemon {
+public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     private ScheduledExecutorService executorService;
     private ShovelDaemonConfig shovelDaemonConfig;
@@ -45,7 +47,7 @@ public class ShovelDaemon implements Daemon {
 
         executorService = Executors.newScheduledThreadPool(10);
 
-        this.profileManager.onChanged(this::setProfile);
+        this.profileManager.onChanged(this::setProfileInternal);
     }
 
     public ShovelDaemon(String[] args) {
@@ -57,8 +59,27 @@ public class ShovelDaemon implements Daemon {
 
     @Override
     public void init(DaemonContext context) throws DaemonInitException, Exception {
+        String[] daemonArgs = context.getArguments();
 
-        shovelDaemonConfig = Config.fromDefaults().apply(Config.fromArgs(context.getArguments()));
+        String configFilePath = null;
+        try {
+            for (int i = 0; i < daemonArgs.length; i++) {
+                if (daemonArgs[i].equals("-configFile")) {
+                    configFilePath = daemonArgs[i + 1];
+                }
+            }
+        } catch (Exception ignored) {}
+
+        shovelDaemonConfig = Config.fromDefaults();
+
+        try {
+            if (configFilePath != null) {
+                shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromStream(
+                        Files.newInputStream(Paths.get(configFilePath))));
+            }
+        } catch (Exception ignored) {}
+
+        shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromArgs(context.getArguments()));
 
         initialize();
     }
@@ -70,11 +91,14 @@ public class ShovelDaemon implements Daemon {
         logger.info("source host: {}", shovelDaemonConfig.nodeHost());
         logger.info("source port: {}", shovelDaemonConfig.nodePort());
 
+        logger.info("api host: {}", shovelDaemonConfig.apiHost());
+        logger.info("api port: {}", shovelDaemonConfig.apiPort());
+
         shovelManager = new AutomaticRestartingShovelManager(executorService, 5000);
 
         profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
 
-        profileManager.onChanged(this::setProfile);
+        profileManager.onChanged(this::setProfileInternal);
     }
 
     @Override
@@ -128,7 +152,29 @@ public class ShovelDaemon implements Daemon {
         }
     }
 
-    private void setProfile(Profile newProfile) {
+    @Override
+    public List<String> shovelDescriptors() {
+        return shovelManager.shovelDescriptors();
+    }
+
+    @Override
+    public void restartShovels() {
+        shovelManager.stop();
+        shovelManager.start();
+    }
+
+    @Override
+    public Profile getProfile() {
+        return profileManager.get();
+    }
+
+    @Override
+    public void setProfile(Profile profile) {
+        profileManager.set(profile);
+    }
+
+    private void setProfileInternal(Profile newProfile) {
+        logger.info("Setting new profile...");
         Set<MessageShovel> shovels = new HashSet<>();
 
         TLSContext nodeContext = newProfile.getNodeContext();

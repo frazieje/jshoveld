@@ -33,17 +33,17 @@ CLI_EXEC="$JAVA_HOME/bin/java"
 # The path to the jar file
 JAR_PATH="$FILE_PATH/build/libs/jble6lowpanshoveld-0.1.jar"
 
-# The path to the logging framework to be linked for the daemon via slf4j
-LOG_CLASS_PATH="$FILE_PATH/build/output/libs/logback-classic-1.2.3.jar:$FILE_PATH/build/output/libs/logback-core-1.2.3.jar"
+# Gradle dependencies classpath
+GRADLE_CLASS_PATH="$FILE_PATH/build/output/libs/*"
 
 # Our classpath including our jar file
-CLASS_PATH="$JAR_PATH:$FILE_PATH/build/output/libs/commons-daemon-1.0.15.jar:$FILE_PATH/build/output/libs/slf4j-api-1.7.25.jar:$LOG_CLASS_PATH"
+CLASS_PATH="$JAR_PATH:$GRADLE_CLASS_PATH"
 
 # The fully qualified name of the class to execute
 CLASS="com.spoohapps.jble6lowpanshoveld.ShovelDaemon"
 
 # Any command line arguments to be passed to the our Java Daemon implementations init() method 
-ARGS="-f $FILE_PATH/profile.conf"
+ARGS="-configFile $FILE_PATH/jble6lowpanshoveld.conf -f $FILE_PATH/profile.conf"
 
 # The file that will contain our process identification number (pid) for other scripts/programs that need to access it.
 PID="/var/run/$NAME.pid"

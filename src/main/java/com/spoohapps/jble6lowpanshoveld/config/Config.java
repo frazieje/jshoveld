@@ -35,13 +35,13 @@ public class Config implements ShovelDaemonConfig {
 
     private Config() {}
 
-    public static Config fromDefaults() {
+    public static ShovelDaemonConfig fromDefaults() {
         Config config = new Config();
         config.profileFilePath = Paths.get(System.getProperty("user.home"), "profile.conf").toString();
         config.apiHost = "";
         config.nodeHost = "";
-        config.apiPort = 5672;
-        config.nodePort = 5672;
+        config.apiPort = 5671;
+        config.nodePort = 5671;
         return config;
     }
 
