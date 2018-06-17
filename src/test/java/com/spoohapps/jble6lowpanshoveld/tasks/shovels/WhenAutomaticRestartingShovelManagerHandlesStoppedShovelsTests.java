@@ -1,5 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
+import com.spoohapps.jble6lowpanshoveld.testhelpers.FakeConnectionFactory;
+import com.spoohapps.jble6lowpanshoveld.testhelpers.TestConnectionSettings;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -8,13 +10,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,10 +40,34 @@ public class WhenAutomaticRestartingShovelManagerHandlesStoppedShovelsTests {
 
         executor = Executors.newScheduledThreadPool(3);
 
-        restartingShovelMock = mock(MessageShovel.class);
-        notRestartingShovelMock = mock(MessageShovel.class);
+        Map<String, String> restartingShovelSettings = new HashMap<>();
+        restartingShovelSettings.put("prop", "value");
 
-        shovelCloneMock = mock(MessageShovel.class);
+        Map<String, String> notRestartingShovelSettings = new HashMap<>();
+        notRestartingShovelSettings.put("prop1", "value1");
+
+        restartingShovelMock = spy(new SimpleMessageShovel(
+                new ShovelContext(
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(restartingShovelSettings),
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(restartingShovelSettings)
+                )));
+        notRestartingShovelMock = spy(new SimpleMessageShovel(
+                new ShovelContext(
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(notRestartingShovelSettings),
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(notRestartingShovelSettings)
+                )));
+
+        shovelCloneMock = spy(new SimpleMessageShovel(
+                new ShovelContext(
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(restartingShovelSettings),
+                        new FakeConnectionFactory(),
+                        new TestConnectionSettings(restartingShovelSettings)
+                )));
 
         when(restartingShovelMock.getConnectionDescriptions()).thenReturn(
                 Arrays.asList("Consuming from [127.0.0.1:5671]", "Publishing to [127.0.0.1:5671]"));
@@ -84,16 +107,6 @@ public class WhenAutomaticRestartingShovelManagerHandlesStoppedShovelsTests {
     @Test
     public void shouldCloneMessageShovel() {
         verify(restartingShovelMock).clone();
-    }
-
-    @Test
-    public void shouldRegisterForOnStoppedEventOnClonedShovel() {
-        verify(shovelCloneMock).onStopped(notNull());
-    }
-
-    @Test
-    public void shouldStartClonedShovel() {
-        verify(shovelCloneMock).start();
     }
 
     @Test
