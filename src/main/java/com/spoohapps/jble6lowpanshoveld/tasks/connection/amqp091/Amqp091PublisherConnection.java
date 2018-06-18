@@ -69,11 +69,7 @@ public class Amqp091PublisherConnection implements PublisherConnection {
         } catch (IOException | TimeoutException e) {
             logger.error("Error opening publisher channel: {}", e.getMessage());
             e.printStackTrace();
-            if (channel != null) {
-                closeInternal();
-            } else {
-                notifyShutdown();
-            }
+            closeInternal();
         }
     }
 
@@ -94,9 +90,15 @@ public class Amqp091PublisherConnection implements PublisherConnection {
     }
 
     private void closeInternal() {
+        logger.info("internally closing publisher connection");
         try {
-            if (channel != null)
+            if (channel != null) {
+                logger.info("channel not null, closing");
                 channel.close();
+            } else {
+                logger.info("channel null, notifying");
+                notifyShutdown();
+            }
         } catch (IOException | TimeoutException e) {
             logger.error("Error closing connection: {}", e.getMessage());
             e.printStackTrace();

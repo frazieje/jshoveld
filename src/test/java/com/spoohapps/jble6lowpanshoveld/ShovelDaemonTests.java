@@ -1,6 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
+import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerBroadcaster;
 import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
@@ -29,6 +30,8 @@ public class ShovelDaemonTests {
     private ProfileManager mockProfileManager;
     private ShovelManager mockShovelManager;
 
+    private ShovelDaemonControllerBroadcaster mockControllerBroadcaster;
+
     private String expectedNodeHost = "localhost";
     private int expectedNodePort = 5671;
     private String expectedApiHost = "www.spoohapps.com";
@@ -52,6 +55,8 @@ public class ShovelDaemonTests {
 
         mockShovelManager = mock(ShovelManager.class);
 
+        mockControllerBroadcaster = mock(ShovelDaemonControllerBroadcaster.class);
+
         when(mockConfig.nodeHost()).thenReturn(expectedNodeHost);
         when(mockConfig.nodePort()).thenReturn(expectedNodePort);
 
@@ -60,7 +65,7 @@ public class ShovelDaemonTests {
 
         when(mockConfig.profileFilePath()).thenReturn(expectedProfileFilePath);
 
-        daemon = new ShovelDaemon(mockConfig, mockProfileManager, mockShovelManager);
+        daemon = new ShovelDaemon(mockConfig, mockProfileManager, mockShovelManager, mockControllerBroadcaster);
 
         verify(mockProfileManager).onChanged(setProfile.capture());
 
@@ -85,6 +90,11 @@ public class ShovelDaemonTests {
     @Test
     public void shouldRegisterForProfileEvents() {
         verify(mockProfileManager).onChanged(any());
+    }
+
+    @Test
+    public void shouldStartControllerBroadcaster() {
+        verify(mockControllerBroadcaster).start();
     }
 
     @Test

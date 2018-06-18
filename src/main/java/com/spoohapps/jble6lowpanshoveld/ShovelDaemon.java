@@ -40,7 +40,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     public ShovelDaemon() {}
 
-    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager, ShovelManager shovelManager) {
+    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager, ShovelManager shovelManager, ShovelDaemonControllerBroadcaster controllerBroadcaster) {
 
         shovelDaemonConfig = config;
 
@@ -51,6 +51,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         executorService = Executors.newScheduledThreadPool(10);
 
         this.profileManager.onChanged(this::setProfileInternal);
+
+        this.controllerBroadcaster = controllerBroadcaster;
     }
 
     public ShovelDaemon(String[] args) {
