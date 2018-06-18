@@ -21,7 +21,6 @@ public class CommandLineShovelDaemonController {
 
             if (command != null) {
                 if (command.toLowerCase().equals("-status")) {
-                    System.out.println("-Shovel Daemon Status-");
                     System.out.println(stub.shovelDescriptors().stream().collect(Collectors.joining("\n")));
                 }
             }

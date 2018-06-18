@@ -2,6 +2,8 @@ package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
+import com.spoohapps.jble6lowpanshoveld.controller.RemoteShovelDaemonControllerBroadcaster;
+import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerBroadcaster;
 import com.spoohapps.jble6lowpanshoveld.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
 import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
@@ -31,6 +33,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
     private ProfileManager profileManager;
 
     private ShovelManager shovelManager;
+
+    private ShovelDaemonControllerBroadcaster controllerBroadcaster;
 
     private final Logger logger = LoggerFactory.getLogger(ShovelDaemon.class);
 
@@ -98,6 +102,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         profileManager = new FileBasedProfileManager(Paths.get(shovelDaemonConfig.profileFilePath()));
 
         profileManager.onChanged(this::setProfileInternal);
+
+        controllerBroadcaster = new RemoteShovelDaemonControllerBroadcaster(this, shovelDaemonConfig.controllerPort());
     }
 
     @Override
@@ -108,12 +114,16 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         shovelManager.start();
 
         profileManager.start();
+
+        controllerBroadcaster.start();
     }
 
     @Override
     public void stop() throws Exception {
 
         logger.info("Stopping...");
+
+        controllerBroadcaster.stop();
 
         profileManager.stop();
 

@@ -6,5 +6,6 @@ public interface ShovelDaemonConfig {
     String nodeHost();
     int apiPort();
     int nodePort();
+    int controllerPort();
     ShovelDaemonConfig apply(ShovelDaemonConfig other);
 }

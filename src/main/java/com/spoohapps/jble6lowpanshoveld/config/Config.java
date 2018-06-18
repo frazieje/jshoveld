@@ -17,13 +17,15 @@ public class Config implements ShovelDaemonConfig {
     private static final List<String> nodeHostKeys = Arrays.asList("nodeHost", "n");
     private static final List<String> apiPortKeys = Arrays.asList("apiPort", "p");
     private static final List<String> nodePortKeys = Arrays.asList("nodePort", "l");
+    private static final List<String> controllerPortKeys = Arrays.asList("controllerPort", "c");
 
     private static final Set<String> keys =
             Stream.of(profileFilePathKeys,
                         apiHostKeys,
                         nodeHostKeys,
                         apiPortKeys,
-                        nodePortKeys)
+                        nodePortKeys,
+                        controllerPortKeys)
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
 
@@ -32,6 +34,7 @@ public class Config implements ShovelDaemonConfig {
     private String nodeHost;
     private int apiPort;
     private int nodePort;
+    private int controllerPort;
 
     private Config() {}
 
@@ -42,6 +45,7 @@ public class Config implements ShovelDaemonConfig {
         config.nodeHost = "";
         config.apiPort = 5671;
         config.nodePort = 5671;
+        config.controllerPort = 1099;
         return config;
     }
 
@@ -206,6 +210,11 @@ public class Config implements ShovelDaemonConfig {
     @Override
     public int nodePort() {
         return nodePort;
+    }
+
+    @Override
+    public int controllerPort() {
+        return controllerPort;
     }
 
 }
