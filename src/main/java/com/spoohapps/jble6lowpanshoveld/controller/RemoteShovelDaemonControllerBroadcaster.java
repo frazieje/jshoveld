@@ -37,7 +37,7 @@ public class RemoteShovelDaemonControllerBroadcaster implements ShovelDaemonCont
             logger.error("creating RMI broadcaster exception: " + e.getMessage());
             try {
                 logger.info("Get existing registry");
-                rmiRegistry = LocateRegistry.getRegistry(null);
+                rmiRegistry = LocateRegistry.getRegistry();
                 rmiRegistry.rebind(ControllerName, UnicastRemoteObject.exportObject(controller, 0));
                 logger.info("RMI Server ready");
             } catch (RemoteException rm) {

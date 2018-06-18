@@ -26,7 +26,6 @@ public class CommandLineShovelDaemonController {
             }
         } catch (Exception e) {
             logger.error("Client exception: " + e.toString());
-            e.printStackTrace();
         }
     }
 }
