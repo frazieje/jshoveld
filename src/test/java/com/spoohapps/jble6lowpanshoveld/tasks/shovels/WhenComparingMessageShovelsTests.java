@@ -16,7 +16,8 @@ public class WhenComparingMessageShovelsTests {
                 new FakeConnectionFactory(),
                 new TestConnectionSettings(),
                 new FakeConnectionFactory(),
-                new TestConnectionSettings()));
+                new TestConnectionSettings()),
+            HopsIncrementingMessageShovel.class.getSimpleName());
 
     @Test
     public void shouldEqual() {
@@ -25,7 +26,8 @@ public class WhenComparingMessageShovelsTests {
                     new FakeConnectionFactory(),
                     new TestConnectionSettings(),
                     new FakeConnectionFactory(),
-                    new TestConnectionSettings()));
+                    new TestConnectionSettings()),
+                HopsIncrementingMessageShovel.class.getSimpleName());
 
         assertEquals(shovel, otherShovel);
     }
@@ -37,7 +39,8 @@ public class WhenComparingMessageShovelsTests {
                     new FakeConnectionFactory(),
                     new TestConnectionSettings(),
                     new FakeConnectionFactory(),
-                    new TestConnectionSettings()));
+                    new TestConnectionSettings()),
+                SimpleMessageShovel.class.getSimpleName());
 
         assertNotEquals(shovel, otherShovel);
     }

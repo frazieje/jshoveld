@@ -55,7 +55,9 @@ public class HopsIncrementingMessageShovelTests {
                     mockSourceFactory,
                     mockSourceSettings,
                     mockDestinationFactory,
-                    mockDestinationSettings));
+                    mockDestinationSettings),
+                HopsIncrementingMessageShovel.class.getSimpleName()
+                );
 
         shovel.start();
     }

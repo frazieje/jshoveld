@@ -57,7 +57,8 @@ public class SimpleMessageShovelTests {
                         mockSourceFactory,
                         mockSourceSettings,
                         mockDestinationFactory,
-                        mockDestinationSettings));
+                        mockDestinationSettings),
+                SimpleMessageShovel.class.getSimpleName());
 
         shovel.start();
     }

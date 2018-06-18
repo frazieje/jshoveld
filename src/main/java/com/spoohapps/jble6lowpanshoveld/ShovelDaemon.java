@@ -91,7 +91,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     private void initialize() {
 
-        executorService = Executors.newScheduledThreadPool(10);
+        executorService = Executors.newScheduledThreadPool(16);
 
         logger.info("source host: {}", shovelDaemonConfig.nodeHost());
         logger.info("source port: {}", shovelDaemonConfig.nodePort());
@@ -188,6 +188,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         logger.info("Setting new profile...");
         Set<MessageShovel> shovels = new HashSet<>();
 
+        String profileId = newProfile.getId();
+
         TLSContext nodeContext = newProfile.getNodeContext();
 
         if (nodeContext != null && nodeContext.hasValue()) {
@@ -197,9 +199,9 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
                     shovelDaemonConfig.nodePort(),
                     nodeContext);
 
-            shovels.add(getDeviceIncomingShovel(nodeFactory, nodeFactory, newProfile.getId()));
+            shovels.add(getDeviceIncomingShovel(nodeFactory, nodeFactory, profileId));
 
-            shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, newProfile.getId()));
+            shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, profileId));
 
             shovels.add(getAppIncomingShovel(nodeFactory, nodeFactory));
 
@@ -214,9 +216,9 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
                         shovelDaemonConfig.apiPort(),
                         apiContext);
 
-                shovels.add(getRemoteShovel(nodeFactory, apiFactory, newProfile.getId()));
+                shovels.add(getApiIncomingShovel(apiFactory, nodeFactory, profileId));
 
-                shovels.add(getRemoteShovel(apiFactory, nodeFactory, newProfile.getId()));
+                shovels.add(getApiOutgoingShovel(nodeFactory, apiFactory, profileId));
             }
         }
 
@@ -233,75 +235,101 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
     }
 
     private MessageShovel getDeviceIncomingShovel(ConnectionFactory sourcefactory, ConnectionFactory destinationFactory, String profileId) {
+        String name = "DeviceIncomingShovel";
         return new DeviceIncomingMessageShovel(
                 new ShovelContext(
                         sourcefactory,
                         new Amqp091ConsumerConnectionSettings(
                                 "amq.topic",
-                                "DeviceIncomingMessageShovel",
+                                name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
                                 "far.app"
                         )),
+                name,
                 profileId);
     }
 
     private MessageShovel getDeviceOutgoingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory, String profileId) {
+        String name = "DeviceOutgoingShovel";
         return new DeviceOutgoingMessageShovel(
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
                                 "far.app",
-                                "DeviceOutgoingMessageShovel",
+                                name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
                             "amq.topic"
                         )),
+                name,
                 profileId);
     }
 
     private MessageShovel getAppIncomingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory) {
+        String name = "AppIncomingShovel";
         return new HopsIncrementingMessageShovel(
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
                                 "far.incoming",
-                                "AppIncomingMessageShovel",
+                                name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
                                 "far.app"
-                        )));
+                        )),
+                        name);
     }
 
     private MessageShovel getAppOutgoingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory) {
+        String name = "AppOutgoingShovel";
         return new ZeroHopsMessageShovel(
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
                                 "far.app",
-                                "AppOutgoingMessageShovel",
+                                name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
                                 "far.outgoing"
-                        )));
+                        )),
+                        name);
     }
 
-    private MessageShovel getRemoteShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory, String profileId) {
+    private MessageShovel getApiIncomingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory, String profileId) {
+        String name = "ApiIncomingShovel";
         return new SimpleMessageShovel(
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
                                 "far.outgoing",
-                                "ApiMessageShovel",
+                                "ConsumerQueue-" + profileId,
                                 profileId + ".#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
                                 "far.incoming"
-                        )));
+                        )),
+                        name);
+    }
+
+    private MessageShovel getApiOutgoingShovel(ConnectionFactory sourceFactory, ConnectionFactory destinationFactory, String profileId) {
+        String name = "ApiOutgoingShovel";
+        return new SimpleMessageShovel(
+                new ShovelContext(
+                        sourceFactory,
+                        new Amqp091ConsumerConnectionSettings(
+                                "far.outgoing",
+                                name + "Queue",
+                                "#"),
+                        destinationFactory,
+                        new Amqp091PublisherConnectionSettings(
+                                "far.incoming"
+                        )),
+                name);
     }
 
 }

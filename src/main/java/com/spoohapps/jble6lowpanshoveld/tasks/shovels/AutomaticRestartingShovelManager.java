@@ -114,7 +114,7 @@ public class AutomaticRestartingShovelManager implements ShovelManager {
     private String shovelDescriptor(MessageShovel shovel) {
         String description = shovel.getConnectionDescriptions().stream()
                 .collect(Collectors.joining(","));
-        return "{" + description + "}";
+        return shovel.getName() + " (" + shovel.getType() + ")" + " - " + "{" + description + "}";
     }
 
     private void shovelStopped(MessageShovel shovel) {

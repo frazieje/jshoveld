@@ -59,6 +59,7 @@ public class DeviceOutgoingMessageShovelTests {
                         mockSourceSettings,
                         mockDestinationFactory,
                         mockDestinationSettings),
+                DeviceOutgoingMessageShovel.class.getSimpleName(),
                 expectedProfileId);
 
         shovel.start();

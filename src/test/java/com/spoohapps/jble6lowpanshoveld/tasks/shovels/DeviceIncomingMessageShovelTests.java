@@ -60,6 +60,7 @@ public class DeviceIncomingMessageShovelTests {
                         mockSourceSettings,
                         mockDestinationFactory,
                         mockDestinationSettings),
+                DeviceIncomingMessageShovel.class.getSimpleName(),
                 expectedProfileId);
 
         shovel.start();
@@ -142,5 +143,4 @@ public class DeviceIncomingMessageShovelTests {
         messageCaptor.getValue().accept(originalMessage);
         verify(mockPublisherConnection, times(0)).publish(any());
     }
-
 }

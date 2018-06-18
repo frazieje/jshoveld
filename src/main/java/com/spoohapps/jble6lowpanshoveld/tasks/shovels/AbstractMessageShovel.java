@@ -24,13 +24,17 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
     private Class<T> subclass;
 
+    private final String name;
+
+    private final String type;
+
     final Logger logger;
 
     private AtomicBoolean consumerClosed = new AtomicBoolean(false);
     private AtomicBoolean publisherClosed = new AtomicBoolean(false);
 
     @SuppressWarnings("unchecked")
-    AbstractMessageShovel(ShovelContext context) {
+    AbstractMessageShovel(ShovelContext context, String name) {
 
         this.subclass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
@@ -38,6 +42,10 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
         logger = LoggerFactory.getLogger(subclass);
 
         this.context = context;
+
+        this.name = name;
+
+        type = subclass.getSimpleName();
 
         consumer = context.getSourceFactory().newConsumerConnection(context.getSourceSettings());
         publisher = context.getDestinationFactory().newPublisherConnection(context.getDestinationSettings());
@@ -101,11 +109,21 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
     public MessageShovel clone() {
         try {
             Constructor<? extends AbstractMessageShovel> constructor =
-                    subclass.getConstructor(ShovelContext.class);
-            return constructor.newInstance(context);
+                    subclass.getConstructor(ShovelContext.class, String.class);
+            return constructor.newInstance(context, name);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new RuntimeException("Could not clone shovel", e);
         }

@@ -15,7 +15,8 @@ public class WhenCloningMessageShovelTests {
                 new FakeConnectionFactory(),
                 new TestConnectionSettings(),
                 new FakeConnectionFactory(),
-                new TestConnectionSettings()));
+                new TestConnectionSettings()),
+            HopsIncrementingMessageShovel.class.getSimpleName());
 
     @Test
     public void shouldEqualClone() {

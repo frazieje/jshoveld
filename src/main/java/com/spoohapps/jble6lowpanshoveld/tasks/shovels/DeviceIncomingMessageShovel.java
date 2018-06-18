@@ -7,8 +7,8 @@ public class DeviceIncomingMessageShovel extends AbstractMessageShovel<DeviceInc
 
     private final String profileId;
 
-    public DeviceIncomingMessageShovel(ShovelContext context, String profileId) {
-        super(context);
+    public DeviceIncomingMessageShovel(ShovelContext context, String name, String profileId) {
+        super(context, name);
         this.profileId = profileId;
     }
 

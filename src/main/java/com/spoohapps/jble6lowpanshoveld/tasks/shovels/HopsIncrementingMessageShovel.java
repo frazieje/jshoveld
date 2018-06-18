@@ -5,8 +5,8 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 
 public class HopsIncrementingMessageShovel extends AbstractMessageShovel<HopsIncrementingMessageShovel> {
 
-    public HopsIncrementingMessageShovel(ShovelContext context) {
-        super(context);
+    public HopsIncrementingMessageShovel(ShovelContext context, String name) {
+        super(context, name);
     }
 
     @Override

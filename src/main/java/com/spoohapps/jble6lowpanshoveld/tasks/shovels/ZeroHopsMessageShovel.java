@@ -5,8 +5,8 @@ import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
 
 public class ZeroHopsMessageShovel extends AbstractMessageShovel<ZeroHopsMessageShovel> {
 
-    public ZeroHopsMessageShovel(ShovelContext context) {
-        super(context);
+    public ZeroHopsMessageShovel(ShovelContext context, String name) {
+        super(context, name);
     }
 
     @Override

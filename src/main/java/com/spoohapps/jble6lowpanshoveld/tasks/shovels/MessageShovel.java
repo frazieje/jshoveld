@@ -7,5 +7,7 @@ public interface MessageShovel {
     void stop();
     void onStopped(Runnable stopped);
     List<String> getConnectionDescriptions();
+    String getName();
+    String getType();
     MessageShovel clone();
 }

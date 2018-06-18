@@ -56,7 +56,8 @@ public class ZeroHopsMessageShovelTests {
                         mockSourceFactory,
                         mockSourceSettings,
                         mockDestinationFactory,
-                        mockDestinationSettings));
+                        mockDestinationSettings),
+                ZeroHopsMessageShovel.class.getSimpleName());
 
         shovel.start();
     }

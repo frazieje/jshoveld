@@ -52,14 +52,16 @@ public class WhenAutomaticRestartingShovelManagerHandlesStoppedShovelsTests {
                         new TestConnectionSettings(restartingShovelSettings),
                         new FakeConnectionFactory(),
                         new TestConnectionSettings(restartingShovelSettings)
-                )));
+                ),
+                SimpleMessageShovel.class.getSimpleName()));
         notRestartingShovelMock = spy(new SimpleMessageShovel(
                 new ShovelContext(
                         new FakeConnectionFactory(),
                         new TestConnectionSettings(notRestartingShovelSettings),
                         new FakeConnectionFactory(),
                         new TestConnectionSettings(notRestartingShovelSettings)
-                )));
+                ),
+                SimpleMessageShovel.class.getSimpleName()));
 
         shovelCloneMock = spy(new SimpleMessageShovel(
                 new ShovelContext(
@@ -67,7 +69,8 @@ public class WhenAutomaticRestartingShovelManagerHandlesStoppedShovelsTests {
                         new TestConnectionSettings(restartingShovelSettings),
                         new FakeConnectionFactory(),
                         new TestConnectionSettings(restartingShovelSettings)
-                )));
+                ),
+                SimpleMessageShovel.class.getSimpleName()));
 
         when(restartingShovelMock.getConnectionDescriptions()).thenReturn(
                 Arrays.asList("Consuming from [127.0.0.1:5671]", "Publishing to [127.0.0.1:5671]"));
