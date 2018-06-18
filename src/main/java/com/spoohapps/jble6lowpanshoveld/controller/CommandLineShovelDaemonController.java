@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.spoohapps.jble6lowpanshoveld.controller.RemoteShovelDaemonControllerBroadcaster.ControllerName;
@@ -22,7 +23,9 @@ public class CommandLineShovelDaemonController {
 
             if (command != null) {
                 if (command.toLowerCase().equals("-status")) {
-                    System.out.println(stub.shovelDescriptors().stream().collect(Collectors.joining("\n")));
+                    List<String> shovelDescriptors = stub.shovelDescriptors();
+                    System.out.println("Shovels: " + shovelDescriptors.size());
+                    System.out.println(shovelDescriptors.stream().collect(Collectors.joining("\n")));
                 }
             }
         } catch (Exception e) {
