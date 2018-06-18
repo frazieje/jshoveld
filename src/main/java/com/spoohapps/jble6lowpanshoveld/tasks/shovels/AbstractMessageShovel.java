@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> implements MessageShovel {
 
-    private ShovelContext context;
+    ShovelContext context;
 
     private ConsumerConnection consumer;
     private PublisherConnection publisher;
@@ -24,7 +24,7 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
     private Class<T> subclass;
 
-    private final String name;
+    final String name;
 
     private final String type;
 

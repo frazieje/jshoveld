@@ -13,6 +13,11 @@ public class DeviceIncomingMessageShovel extends AbstractMessageShovel<DeviceInc
     }
 
     @Override
+    public MessageShovel clone() {
+        return new DeviceIncomingMessageShovel(context, name, profileId);
+    }
+
+    @Override
     protected void handleMessage(Message message, PublisherConnection publisher) {
         logger.info("consumed message with topic {}, hops {}, deviceFlag {}", message.getTopic(), message.getHops(), message.hasDeviceFlag());
         if (!message.hasDeviceFlag() && !message.getTopic().toLowerCase().startsWith(profileId + ".")) {
