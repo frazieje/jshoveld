@@ -29,15 +29,15 @@ public class RemoteShovelDaemonControllerBroadcaster implements ShovelDaemonCont
     public void start() {
         logger.info("Start broadcasting over RMI...");
         try {
-            logger.info("Create registry on port " + port);
-            rmiRegistry = LocateRegistry.createRegistry(port);
+            logger.info("get registry on port " + port);
+            rmiRegistry = LocateRegistry.getRegistry(port);
             rmiRegistry.rebind(ControllerName, UnicastRemoteObject.exportObject(controller, 0));
             logger.info("RMI Server ready");
         } catch (Exception e) {
             logger.error("creating RMI broadcaster exception: " + e.getMessage());
             try {
-                logger.info("Get existing registry");
-                rmiRegistry = LocateRegistry.getRegistry();
+                logger.info("create registry");
+                rmiRegistry = LocateRegistry.createRegistry(port);
                 rmiRegistry.rebind(ControllerName, UnicastRemoteObject.exportObject(controller, 0));
                 logger.info("RMI Server ready");
             } catch (RemoteException rm) {

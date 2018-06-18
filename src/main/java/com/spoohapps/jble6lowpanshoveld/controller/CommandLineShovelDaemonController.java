@@ -16,7 +16,7 @@ public class CommandLineShovelDaemonController {
     public static void main(String[] args) {
         String command = (args.length < 1) ? null : args[0];
         try {
-            Registry registry = LocateRegistry.getRegistry(null);
+            Registry registry = LocateRegistry.getRegistry();
             ShovelDaemonController stub = (ShovelDaemonController) registry.lookup(ControllerName);
 
             if (command != null) {
@@ -25,7 +25,7 @@ public class CommandLineShovelDaemonController {
                 }
             }
         } catch (Exception e) {
-            logger.error("Client exception: " + e.toString());
+            logger.error("Client exception: " + e.toString(), e);
         }
     }
 }
