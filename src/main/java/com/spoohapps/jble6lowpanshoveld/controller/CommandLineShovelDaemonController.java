@@ -14,9 +14,10 @@ public class CommandLineShovelDaemonController {
     private static final Logger logger = LoggerFactory.getLogger(CommandLineShovelDaemonController.class);
 
     public static void main(String[] args) {
-        String command = (args.length < 1) ? null : args[0];
+        String portStr = (args.length < 1) ? null : args[0];
+        String command = (args.length < 2) ? null : args[1];
         try {
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry(portStr != null ? Integer.parseInt(portStr) : 0);
             ShovelDaemonController stub = (ShovelDaemonController) registry.lookup(ControllerName);
 
             if (command != null) {

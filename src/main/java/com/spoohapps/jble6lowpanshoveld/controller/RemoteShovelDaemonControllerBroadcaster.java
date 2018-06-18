@@ -4,7 +4,6 @@ import com.spoohapps.jble6lowpanshoveld.ShovelDaemonController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -29,20 +28,12 @@ public class RemoteShovelDaemonControllerBroadcaster implements ShovelDaemonCont
     public void start() {
         logger.info("Start broadcasting over RMI...");
         try {
-            logger.info("get registry on port " + port);
-            rmiRegistry = LocateRegistry.getRegistry(port);
+            logger.info("create registry on port " + port);
+            rmiRegistry = LocateRegistry.createRegistry(port);
             rmiRegistry.rebind(ControllerName, UnicastRemoteObject.exportObject(controller, 0));
             logger.info("RMI Server ready");
         } catch (Exception e) {
-            logger.error("creating RMI broadcaster exception: " + e.getMessage());
-            try {
-                logger.info("create registry");
-                rmiRegistry = LocateRegistry.createRegistry(port);
-                rmiRegistry.rebind(ControllerName, UnicastRemoteObject.exportObject(controller, 0));
-                logger.info("RMI Server ready");
-            } catch (RemoteException rm) {
-                logger.error("using RMI broadcaster exception: " + e.getMessage());
-            }
+            logger.error("creating RMI broadcaster exception: " + e.getMessage(), e);
         }
     }
 

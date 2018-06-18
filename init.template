@@ -45,8 +45,11 @@ CLASS="com.spoohapps.jble6lowpanshoveld.ShovelDaemon"
 # The fully qualified name of the cli class
 CLI_CLASS="com.spoohapps.jble6lowpanshoveld.controller.CommandLineShovelDaemonController"
 
+#CLI Remote port
+CLI_REMOTE_PORT="9099"
+
 # Any command line arguments to be passed to the our Java Daemon implementations init() method 
-ARGS="-configFile $FILE_PATH/jble6lowpanshoveld.conf -f $FILE_PATH/profile.conf"
+ARGS="-configFile $FILE_PATH/jble6lowpanshoveld.conf -f $FILE_PATH/profile.conf -c $CLI_REMOTE_PORT"
 
 # The file that will contain our process identification number (pid) for other scripts/programs that need to access it.
 PID="/var/run/$NAME.pid"
@@ -66,7 +69,7 @@ jsvc_exec()
 cli_exec()
 {
     cd $FILE_PATH
-    $CLI_EXEC -cp $CLASS_PATH $CLI_CLASS $1
+    $CLI_EXEC -cp $CLASS_PATH $CLI_CLASS $CLI_REMOTE_PORT $1
 }
 
 case "$1" in
