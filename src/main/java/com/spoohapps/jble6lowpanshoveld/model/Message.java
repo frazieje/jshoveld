@@ -8,7 +8,7 @@ public class Message {
 
     private final byte[] payload;
 
-    private final boolean fromDevice;
+    private final boolean deviceFlag;
 
     public String getTopic() {
         return topic;
@@ -22,33 +22,33 @@ public class Message {
         return payload;
     }
 
-    public boolean isFromDevice() { return fromDevice; }
+    public boolean hasDeviceFlag() { return deviceFlag; }
 
     public Message(String topic, byte[] payload) {
         this.topic = topic;
         this.hops = 0;
         this.payload = payload;
-        this.fromDevice = false;
+        this.deviceFlag = false;
     }
 
     public Message(String topic, int hops, byte[] payload) {
         this.topic = topic;
         this.hops = hops;
         this.payload = payload;
-        this.fromDevice = false;
+        this.deviceFlag = false;
     }
 
-    public Message(String topic, boolean fromDevice, byte[] payload) {
+    public Message(String topic, boolean deviceFlag, byte[] payload) {
         this.topic = topic;
         this.hops = 0;
-        this.fromDevice = fromDevice;
+        this.deviceFlag = deviceFlag;
         this.payload = payload;
     }
 
-    public Message(String topic, int hops, boolean fromDevice, byte[] payload) {
+    public Message(String topic, int hops, boolean deviceFlag, byte[] payload) {
         this.topic = topic;
         this.hops = hops;
-        this.fromDevice = fromDevice;
+        this.deviceFlag = deviceFlag;
         this.payload = payload;
     }
 }

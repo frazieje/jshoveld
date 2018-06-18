@@ -11,6 +11,7 @@ public class SimpleMessageShovel extends AbstractMessageShovel<SimpleMessageShov
 
     @Override
     protected void handleMessage(Message message, PublisherConnection publisher) {
-        publisher.publish(message);
+        Message copy = new Message(message.getTopic(), message.getHops(), message.hasDeviceFlag(), message.getPayload());
+        publisher.publish(copy);
     }
 }

@@ -175,7 +175,7 @@ public class Amqp091ConsumerConnectionTests {
         headers.put("x-device", "1");
         when(mockMessage.getHeaders()).thenReturn(headers);
         messageCaptor.getValue().accept(mockMessage);
-        assertTrue(consumedMessage.isFromDevice());
+        assertTrue(consumedMessage.hasDeviceFlag());
     }
 
     @Test

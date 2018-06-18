@@ -14,11 +14,12 @@ public class DeviceOutgoingMessageShovel extends AbstractMessageShovel<DeviceOut
 
     @Override
     protected void handleMessage(Message message, PublisherConnection publisher) {
-        logger.info("consumed message with topic {}, hops {}, fromDevice", message.getTopic(), message.getHops(), message.isFromDevice());
+        logger.info("consumed message with topic {}, hops {}, deviceFlag {}", message.getTopic(), message.getHops(), message.hasDeviceFlag());
 
-        if (!message.isFromDevice() && message.getTopic().toLowerCase().startsWith(profileId + ".")) {
+        if (!message.hasDeviceFlag() && message.getTopic().toLowerCase().startsWith(profileId + ".")) {
             Message newMessage = new Message(
                     message.getTopic().substring(profileId.length()+1),
+                    true,
                     message.getPayload());
 
             publisher.publish(newMessage);

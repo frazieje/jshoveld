@@ -14,9 +14,8 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DeviceIncomingMessageShovelTests {
@@ -118,14 +117,30 @@ public class DeviceIncomingMessageShovelTests {
     }
 
     @Test
-    public void shouldPublishMessageWithDeviceHeader() {
+    public void shouldPublishNewMessageWithDeviceHeader() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
         Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
         Message publishedMessage = publishedMessageCaptor.getValue();
-        assertTrue(publishedMessage.isFromDevice());
+        assertTrue(publishedMessage.hasDeviceFlag());
+    }
+
+    @Test
+    public void shouldNotPublishMessageWithDeviceHeader() {
+        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
+        Message originalMessage = new Message("topic", 0, true, new byte[] { 0, 1});
+        messageCaptor.getValue().accept(originalMessage);
+        verify(mockPublisherConnection, times(0)).publish(any());
+    }
+
+    @Test
+    public void shouldNotPublishMessageWithProfileTopic() {
+        verify(mockConsumerConnection).onConsume(messageCaptor.capture());
+        Message originalMessage = new Message(expectedProfileId + ".topic", 0, true, new byte[] { 0, 1});
+        messageCaptor.getValue().accept(originalMessage);
+        verify(mockPublisherConnection, times(0)).publish(any());
     }
 
 }

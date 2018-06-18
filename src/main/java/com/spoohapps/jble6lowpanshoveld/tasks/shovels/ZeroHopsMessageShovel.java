@@ -14,7 +14,7 @@ public class ZeroHopsMessageShovel extends AbstractMessageShovel<ZeroHopsMessage
         logger.info("consumed message with topic {}, hops {}", message.getTopic(), message.getHops());
 
         if (message.getHops() == 0) {
-            Message newMessage = new Message(message.getTopic(), message.getHops(), message.isFromDevice(), message.getPayload());
+            Message newMessage = new Message(message.getTopic(), message.getHops(), message.hasDeviceFlag(), message.getPayload());
 
             publisher.publish(newMessage);
         }

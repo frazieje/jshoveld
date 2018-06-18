@@ -13,7 +13,7 @@ public class HopsIncrementingMessageShovel extends AbstractMessageShovel<HopsInc
     protected void handleMessage(Message message, PublisherConnection publisher) {
         logger.info("consumed message with topic {}, hops {}", message.getTopic(), message.getHops());
 
-        Message newMessage = new Message(message.getTopic(), message.getHops()+1, message.isFromDevice(), message.getPayload());
+        Message newMessage = new Message(message.getTopic(), message.getHops()+1, message.hasDeviceFlag(), message.getPayload());
 
         publisher.publish(newMessage);
     }

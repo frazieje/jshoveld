@@ -33,7 +33,7 @@ public class Amqp091PublisherConnection implements PublisherConnection {
 
         headers.put("x-hops", message.getHops());
 
-        if (message.isFromDevice()) {
+        if (message.hasDeviceFlag()) {
             headers.put("x-device", 1);
         }
 

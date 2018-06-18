@@ -116,7 +116,7 @@ public class DeviceOutgoingMessageShovelTests {
     }
 
     @Test
-    public void shouldNotPublishMessagePublishedFromDevice() {
+    public void shouldNotPublishMessagePublishedForDevices() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
         Message originalMessage = new Message(expectedProfileId + ".topic", true, new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
