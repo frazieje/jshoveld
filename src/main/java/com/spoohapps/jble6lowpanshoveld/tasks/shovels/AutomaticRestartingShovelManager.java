@@ -95,6 +95,7 @@ public class AutomaticRestartingShovelManager implements ShovelManager {
         if (isActive.get()) {
             toStart.forEach(shovel -> {
                 logger.info("starting shovel " + shovelDescriptor(shovel));
+                shovel.onStopped(() -> shovelStopped(shovel));
                 shovel.start();
             });
             toRemove.forEach(shovel -> {
