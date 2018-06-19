@@ -71,6 +71,10 @@ public class ProfileFileHelper {
         return streamOf(getProfileIdContents(profileId) + getNodeContents() + getApiContents());
     }
 
+    public static InputStream streamWithNode() {
+        return streamOf(getNodeContents());
+    }
+
     public static byte[] bytesWithProfileId(String profileId) {
         return byteArrayOf(getProfileIdContents(profileId));
     }

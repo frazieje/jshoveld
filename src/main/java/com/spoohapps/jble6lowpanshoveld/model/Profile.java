@@ -83,8 +83,10 @@ public class Profile {
             try { profileStream.close(); } catch (Throwable ignore) {}
         }
 
-        if (p.id != null)
-            return p;
+        if (p.id != null
+                || (p.getNodeContext() != null && p.getNodeContext().hasValue())
+                || (p.getApiContext() != null && p.getApiContext().hasValue()))
+        return p;
 
         return null;
     }
@@ -228,9 +230,13 @@ public class Profile {
             buf.append(profileIdStartDelimiter).append(lineSeparator);
             buf.append(id).append(lineSeparator);
             buf.append(profileIdEndDelimiter).append(lineSeparator);
+        }
 
+        if (nodeContext != null && nodeContext.hasValue()) {
             writeSection(encoder, buf, nodeContext, nodeStartDelimiter, nodeEndDelimiter);
+        }
 
+        if (apiContext != null && apiContext.hasValue()) {
             writeSection(encoder, buf, apiContext, apiStartDelimiter, apiEndDelimiter);
         }
 

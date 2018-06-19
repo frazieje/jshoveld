@@ -199,26 +199,29 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
                     shovelDaemonConfig.nodePort(),
                     nodeContext);
 
-            shovels.add(getDeviceIncomingShovel(nodeFactory, nodeFactory, profileId));
-
-            shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, profileId));
-
             shovels.add(getAppIncomingShovel(nodeFactory, nodeFactory));
 
             shovels.add(getAppOutgoingShovel(nodeFactory, nodeFactory));
 
-            TLSContext apiContext = newProfile.getApiContext();
+            if (profileId != null) {
 
-            if (apiContext != null && apiContext.hasValue()) {
+                shovels.add(getDeviceIncomingShovel(nodeFactory, nodeFactory, profileId));
 
-                ConnectionFactory apiFactory = createAmqp091ConnectionFactory(
-                        shovelDaemonConfig.apiHost(),
-                        shovelDaemonConfig.apiPort(),
-                        apiContext);
+                shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, profileId));
 
-                shovels.add(getApiIncomingShovel(apiFactory, nodeFactory, profileId));
+                TLSContext apiContext = newProfile.getApiContext();
 
-                shovels.add(getApiOutgoingShovel(nodeFactory, apiFactory, profileId));
+                if (apiContext != null && apiContext.hasValue()) {
+
+                    ConnectionFactory apiFactory = createAmqp091ConnectionFactory(
+                            shovelDaemonConfig.apiHost(),
+                            shovelDaemonConfig.apiPort(),
+                            apiContext);
+
+                    shovels.add(getApiIncomingShovel(apiFactory, nodeFactory, profileId));
+
+                    shovels.add(getApiOutgoingShovel(nodeFactory, apiFactory, profileId));
+                }
             }
         }
 
