@@ -49,8 +49,6 @@ public class WhenConnectingToRealBrokerWithProfileTests {
                         testExecutor,
                         "www.spoohapps.com",
                         5671,
-                        "jble6lowpanshoveld",
-                        "jble6lowpanshoveld",
                         profile.getApiContext()
                 ));
 
