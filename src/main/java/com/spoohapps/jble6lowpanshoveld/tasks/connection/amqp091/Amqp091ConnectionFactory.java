@@ -66,7 +66,7 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
         logger.debug("Shutdown signal from channel on connection: {}. total channels = {}", connection.getName(), channels.size());
         channels.remove(channel);
         if (owner == connection && connection != null && channels.size() == 0) {
-            logger.info("All channels gone for connection: {}, closing connection.", connection.getName());
+            logger.debug("All channels gone for connection: {}, closing connection.", connection.getName());
             try {
                 connection.close();
             } catch (Exception e) {

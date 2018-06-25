@@ -20,7 +20,7 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     private ConsumerConnection consumer;
     private PublisherConnection publisher;
 
-    private Runnable stopped;
+    private Runnable onStopped;
 
     private Class<T> subclass;
 
@@ -32,6 +32,8 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
     private AtomicBoolean consumerClosed = new AtomicBoolean(false);
     private AtomicBoolean publisherClosed = new AtomicBoolean(false);
+
+    private AtomicBoolean stopped = new AtomicBoolean(false);
 
     @SuppressWarnings("unchecked")
     AbstractMessageShovel(ShovelContext context, String name) {
@@ -73,12 +75,13 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
     @Override
     public void onStopped(Runnable stopped) {
-        this.stopped = stopped;
+        this.onStopped = stopped;
     }
 
-    private void notifyStopped() {
-        if (stopped != null) {
-            stopped.run();
+    private synchronized void notifyStopped() {
+        if (!stopped.get() && onStopped != null) {
+            stopped.set(true);
+            onStopped.run();
         }
     }
 
