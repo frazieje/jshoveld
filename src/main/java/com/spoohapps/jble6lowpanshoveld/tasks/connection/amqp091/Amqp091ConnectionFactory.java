@@ -69,9 +69,8 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
             logger.info("All channels gone for connection: {}, closing connection.", connection.getName());
             try {
                 connection.close();
-            } catch (IOException e) {
-                logger.error("Error closing connection: {}", e.getMessage());
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Error closing connection: {}", e);
                 connection = null;
             }
         }

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     private ScheduledExecutorService executorService;
+
     private ShovelDaemonConfig shovelDaemonConfig;
 
     private ProfileManager profileManager;
@@ -35,6 +37,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
     private ShovelManager shovelManager;
 
     private ShovelDaemonControllerBroadcaster controllerBroadcaster;
+
+    private Set<ConnectionFactory> connectionFactories;
 
     private final Logger logger = LoggerFactory.getLogger(ShovelDaemon.class);
 
@@ -53,6 +57,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         this.profileManager.onChanged(this::setProfileInternal);
 
         this.controllerBroadcaster = controllerBroadcaster;
+
+        this.connectionFactories = new HashSet<>();
     }
 
     public ShovelDaemon(String[] args) {
@@ -98,6 +104,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
         logger.info("api host: {}", shovelDaemonConfig.apiHost());
         logger.info("api port: {}", shovelDaemonConfig.apiPort());
+
+        connectionFactories = ConcurrentHashMap.newKeySet();
 
         shovelManager = new AutomaticRestartingShovelManager(executorService, 5000);
 
@@ -194,7 +202,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
         if (nodeContext != null && nodeContext.hasValue()) {
 
-            ConnectionFactory nodeFactory = createAmqp091ConnectionFactory(
+            ConnectionFactory nodeFactory = getOrCreateAmqp091ConnectionFactory(
                     shovelDaemonConfig.nodeHost(),
                     shovelDaemonConfig.nodePort(),
                     nodeContext);
@@ -213,7 +221,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
                 if (apiContext != null && apiContext.hasValue()) {
 
-                    ConnectionFactory apiFactory = createAmqp091ConnectionFactory(
+                    ConnectionFactory apiFactory = getOrCreateAmqp091ConnectionFactory(
                             shovelDaemonConfig.apiHost(),
                             shovelDaemonConfig.apiPort(),
                             apiContext);
@@ -228,13 +236,19 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         shovelManager.setShovels(shovels);
     }
 
-    private Amqp091ConnectionFactory createAmqp091ConnectionFactory(String host, int port, TLSContext context) {
-        return new Amqp091ConnectionFactory(
+    private ConnectionFactory getOrCreateAmqp091ConnectionFactory(String host, int port, TLSContext context) {
+        ConnectionFactory newFactory = new Amqp091ConnectionFactory(
                 new RabbitMqAmqp091ConnectionSupplier(
                         executorService,
                         host,
                         port,
                         context));
+        for (ConnectionFactory factory : connectionFactories) {
+            if (factory.equals(newFactory))
+                return factory;
+        }
+        connectionFactories.add(newFactory);
+        return newFactory;
     }
 
     private MessageShovel getDeviceIncomingShovel(ConnectionFactory sourcefactory, ConnectionFactory destinationFactory, String profileId) {

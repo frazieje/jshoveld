@@ -42,9 +42,8 @@ public class Amqp091PublisherConnection implements PublisherConnection {
                     message.getTopic(),
                     headers,
                     message.getPayload());
-        } catch (IOException e) {
-            logger.error("Error publishing message: {}", e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error publishing message: {}", e);
             closeInternal();
         }
     }
@@ -66,9 +65,8 @@ public class Amqp091PublisherConnection implements PublisherConnection {
             channel.addShutdownListener(this::handleShutdown);
             channel.exchangeDeclare(exchange);
             logger.info("publisher connection opened");
-        } catch (IOException | TimeoutException e) {
-            logger.error("Error opening publisher channel: {}", e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error opening publisher channel: {}", e);
             closeInternal();
         }
     }
@@ -99,9 +97,8 @@ public class Amqp091PublisherConnection implements PublisherConnection {
                 logger.info("channel null, notifying");
                 notifyShutdown();
             }
-        } catch (IOException | TimeoutException e) {
-            logger.error("Error closing connection: {}", e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error closing connection: {}", e);
             notifyShutdown();
         }
     }

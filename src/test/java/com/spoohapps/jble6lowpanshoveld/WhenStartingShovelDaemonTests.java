@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ShovelDaemonTests {
+public class WhenStartingShovelDaemonTests {
 
     private ShovelDaemon daemon;
 
