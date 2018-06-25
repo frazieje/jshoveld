@@ -70,7 +70,7 @@ public class Amqp091ConnectionFactory implements ConnectionFactory {
             try {
                 connection.close();
             } catch (Exception e) {
-                logger.error("Error closing connection: {}", e);
+                logger.error("Error closing connection", e);
                 connection = null;
             }
         }

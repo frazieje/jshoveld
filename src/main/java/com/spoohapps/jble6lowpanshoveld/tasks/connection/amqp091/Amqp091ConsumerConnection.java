@@ -57,7 +57,7 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
             channel.consume(queue, this::consumeInternal, this::handleShutdown);
             logger.info("consumer connection opened.");
         } catch (Exception e) {
-            logger.error("Error opening consumer connection: {}", e);
+            logger.error("Error opening consumer connection", e);
             closeInternal();
         }
     }
@@ -113,7 +113,7 @@ public class Amqp091ConsumerConnection implements ConsumerConnection {
                 notifyShutdown();
             }
         } catch (Exception e) {
-            logger.error("Error closing connection: {}", e);
+            logger.error("Error closing connection", e);
             notifyShutdown();
         }
     }
