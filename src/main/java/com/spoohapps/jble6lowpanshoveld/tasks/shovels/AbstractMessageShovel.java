@@ -62,8 +62,10 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
     @Override
     public void start() {
         logger.info("starting...");
-        publisher.open();
-        consumer.open();
+        if (!stopped.get())
+            publisher.open();
+        if (!stopped.get() && !publisherClosed.get())
+            consumer.open();
     }
 
     @Override
