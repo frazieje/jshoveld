@@ -1,10 +1,11 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
+import com.spoohapps.farcommon.model.Message;
+import com.spoohapps.farcommon.connection.ConnectionFactory;
+import com.spoohapps.farcommon.connection.ConnectionSettings;
+import com.spoohapps.farcommon.connection.ConsumerConnection;
+import com.spoohapps.farcommon.connection.PublisherConnection;
+import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -94,7 +95,7 @@ public class HopsIncrementingMessageShovelTests {
     @Test
     public void shouldPublishMessageWithEqualTopic() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
+        Message originalMessage = new ShovelMessage("topic", new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
@@ -105,18 +106,20 @@ public class HopsIncrementingMessageShovelTests {
     @Test
     public void shouldPublishMessageWithIncrementedHops() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
+        ShovelMessage originalMessage = new ShovelMessage("topic", new byte[] { 0, 1});
+        int originalHops = 0;
+        originalMessage.setHops(originalHops);
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());
         Message publishedMessage = publishedMessageCaptor.getValue();
-        assertEquals(originalMessage.getHops()+1, publishedMessage.getHops());
+        assertEquals(originalHops+1, ShovelMessage.from(publishedMessage).getHops());
     }
 
     @Test
     public void shouldPublishMessageWithEqualPayload() {
         verify(mockConsumerConnection).onConsume(messageCaptor.capture());
-        Message originalMessage = new Message("topic", 0, new byte[] { 0, 1});
+        Message originalMessage = new ShovelMessage("topic", new byte[] { 0, 1});
         messageCaptor.getValue().accept(originalMessage);
         ArgumentCaptor<Message> publishedMessageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(mockPublisherConnection).publish(publishedMessageCaptor.capture());

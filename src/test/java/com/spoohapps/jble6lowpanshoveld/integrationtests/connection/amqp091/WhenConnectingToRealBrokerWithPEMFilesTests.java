@@ -1,16 +1,17 @@
 package com.spoohapps.jble6lowpanshoveld.integrationtests.connection.amqp091;
 
-import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.model.TLSContext;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionFactory;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConnectionSettings;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.ConsumerConnection;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConnectionFactory;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091ConsumerConnectionSettings;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.Amqp091PublisherConnectionSettings;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
-import com.spoohapps.jble6lowpanshoveld.testhelpers.ProfileFileHelper;
+import com.spoohapps.farcommon.model.Message;
+import com.spoohapps.farcommon.model.TLSContext;
+import com.spoohapps.farcommon.connection.ConnectionFactory;
+import com.spoohapps.farcommon.connection.ConnectionSettings;
+import com.spoohapps.farcommon.connection.ConsumerConnection;
+import com.spoohapps.farcommon.connection.PublisherConnection;
+import com.spoohapps.farcommon.connection.amqp091.Amqp091ConnectionFactory;
+import com.spoohapps.farcommon.connection.amqp091.Amqp091ConsumerConnectionSettings;
+import com.spoohapps.farcommon.connection.amqp091.Amqp091PublisherConnectionSettings;
+import com.spoohapps.farcommon.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
+import com.spoohapps.farcommon.testhelpers.ProfileFileHelper;
+import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ public class WhenConnectingToRealBrokerWithPEMFilesTests {
         ConnectionSettings consumerSettings = new Amqp091ConsumerConnectionSettings("TestExchange", "TestQueue", testTopic);
         publisherConnection = factory.newPublisherConnection(publisherSettings);
         consumerConnection = factory.newConsumerConnection(consumerSettings);
-        consumerConnection.onConsume(message -> receivedMessage = message);
+        consumerConnection.onConsume(message -> receivedMessage = ShovelMessage.from(message));
         publisherConnection.onClosed(() -> publisherClosed = true);
         consumerConnection.onClosed(() -> consumerClosed = true);
         consumerConnection.open();
@@ -81,7 +82,7 @@ public class WhenConnectingToRealBrokerWithPEMFilesTests {
 
     private boolean publisherClosed = false;
     private boolean consumerClosed = false;
-    private Message receivedMessage;
+    private ShovelMessage receivedMessage;
 
     @Test
     public void consumerShouldConnectToServer() {
@@ -96,14 +97,14 @@ public class WhenConnectingToRealBrokerWithPEMFilesTests {
 
     @Test
     public void shouldConsumeMessage() {
-        publisherConnection.publish(new Message(testTopic, new byte[] { 1, 4 }));
+        publisherConnection.publish(new ShovelMessage(testTopic, new byte[] { 1, 4 }));
         sleep(1500);
         assertNotNull(receivedMessage);
     }
 
     @Test
     public void shouldConsumeMessageWithSameTopic() {
-        publisherConnection.publish(new Message(testTopic, new byte[] { 1, 2 }));
+        publisherConnection.publish(new ShovelMessage(testTopic, new byte[] { 1, 2 }));
         sleep(1500);
         assertEquals(testTopic, receivedMessage.getTopic());
     }
@@ -111,7 +112,7 @@ public class WhenConnectingToRealBrokerWithPEMFilesTests {
     @Test
     public void shouldConsumeMessageWithSamePayload() {
         byte[] expectedPayload = new byte[] { 1, 3 };
-        publisherConnection.publish(new Message(testTopic, new byte[] { 1, 3 }));
+        publisherConnection.publish(new ShovelMessage(testTopic, new byte[] { 1, 3 }));
         sleep(1500);
         assertArrayEquals(expectedPayload, receivedMessage.getPayload());
     }
@@ -119,7 +120,9 @@ public class WhenConnectingToRealBrokerWithPEMFilesTests {
     @Test
     public void shouldConsumeMessageWithSameHops() {
         int expectedHops = 1;
-        publisherConnection.publish(new Message(testTopic, expectedHops, new byte[] { 1, 3 }));
+        ShovelMessage message = new ShovelMessage(testTopic, new byte[] { 1, 3 });
+        message.setHops(expectedHops);
+        publisherConnection.publish(message);
         sleep(1500);
         assertEquals(expectedHops, receivedMessage.getHops());
     }

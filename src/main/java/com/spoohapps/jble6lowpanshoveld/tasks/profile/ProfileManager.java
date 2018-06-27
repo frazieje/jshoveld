@@ -1,6 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.profile;
 
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
+import com.spoohapps.farcommon.model.Profile;
 
 import java.util.function.Consumer;
 

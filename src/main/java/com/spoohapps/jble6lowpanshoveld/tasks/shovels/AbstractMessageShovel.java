@@ -1,7 +1,8 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.*;
+import com.spoohapps.farcommon.model.Message;
+import com.spoohapps.farcommon.connection.*;
+import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
 
         consumer.onClosed(this::consumerClosed);
 
-        consumer.onConsume(message -> handleMessage(message, publisher));
+        consumer.onConsume(message -> handleMessage(ShovelMessage.from(message), publisher));
     }
 
     @Override
@@ -156,5 +157,5 @@ public abstract class AbstractMessageShovel<T extends AbstractMessageShovel> imp
         return true;
     }
 
-    protected abstract void handleMessage(Message message, PublisherConnection publisher);
+    protected abstract void handleMessage(ShovelMessage message, PublisherConnection publisher);
 }

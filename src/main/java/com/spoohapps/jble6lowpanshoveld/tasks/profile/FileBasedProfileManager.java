@@ -1,14 +1,10 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.profile;
 
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
+import com.spoohapps.farcommon.model.Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;

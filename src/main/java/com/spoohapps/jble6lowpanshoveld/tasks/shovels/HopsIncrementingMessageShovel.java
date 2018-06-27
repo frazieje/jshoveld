@@ -1,7 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
+import com.spoohapps.farcommon.connection.PublisherConnection;
+import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 
 public class HopsIncrementingMessageShovel extends AbstractMessageShovel<HopsIncrementingMessageShovel> {
 
@@ -10,11 +10,10 @@ public class HopsIncrementingMessageShovel extends AbstractMessageShovel<HopsInc
     }
 
     @Override
-    protected void handleMessage(Message message, PublisherConnection publisher) {
+    protected void handleMessage(ShovelMessage message, PublisherConnection publisher) {
         logger.info("consumed message with topic {}, hops {}", message.getTopic(), message.getHops());
-
-        Message newMessage = new Message(message.getTopic(), message.getHops()+1, message.hasDeviceFlag(), message.getPayload());
-
+        ShovelMessage newMessage = new ShovelMessage(message.getTopic(), message.getPayload(), message.getHeaders());
+        newMessage.setHops(message.getHops()+1);
         publisher.publish(newMessage);
     }
 }

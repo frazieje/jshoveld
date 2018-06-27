@@ -1,7 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.jble6lowpanshoveld.model.Message;
-import com.spoohapps.jble6lowpanshoveld.tasks.connection.PublisherConnection;
+import com.spoohapps.farcommon.connection.PublisherConnection;
+import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 
 public class DeviceIncomingMessageShovel extends AbstractMessageShovel<DeviceIncomingMessageShovel> {
 
@@ -18,13 +18,14 @@ public class DeviceIncomingMessageShovel extends AbstractMessageShovel<DeviceInc
     }
 
     @Override
-    protected void handleMessage(Message message, PublisherConnection publisher) {
+    protected void handleMessage(ShovelMessage message, PublisherConnection publisher) {
         logger.info("consumed message with topic {}, hops {}, deviceFlag {}", message.getTopic(), message.getHops(), message.hasDeviceFlag());
         if (!message.hasDeviceFlag() && !message.getTopic().toLowerCase().startsWith(profileId + ".")) {
-            Message newMessage = new Message(
+            ShovelMessage newMessage = new ShovelMessage(
                     profileId + "." + message.getTopic(),
-                    true,
-                    message.getPayload());
+                    message.getPayload(),
+                    message.getHeaders());
+            newMessage.setDeviceFlag(true);
             publisher.publish(newMessage);
         }
     }

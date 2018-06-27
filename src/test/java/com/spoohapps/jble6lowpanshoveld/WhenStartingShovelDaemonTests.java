@@ -2,11 +2,11 @@ package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerBroadcaster;
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
+import com.spoohapps.farcommon.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.ShovelManager;
-import com.spoohapps.jble6lowpanshoveld.testhelpers.ProfileFileHelper;
+import com.spoohapps.farcommon.testhelpers.ProfileFileHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

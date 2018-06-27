@@ -1,7 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.profile;
 
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
-import com.spoohapps.jble6lowpanshoveld.testhelpers.ProfileFileHelper;
+import com.spoohapps.farcommon.model.Profile;
+import com.spoohapps.farcommon.testhelpers.ProfileFileHelper;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;

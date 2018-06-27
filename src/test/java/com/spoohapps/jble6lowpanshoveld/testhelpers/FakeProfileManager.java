@@ -1,6 +1,5 @@
 package com.spoohapps.jble6lowpanshoveld.testhelpers;
-
-import com.spoohapps.jble6lowpanshoveld.model.Profile;
+import com.spoohapps.farcommon.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
 
 import java.util.function.Consumer;
