@@ -28,8 +28,6 @@ dependencies {
 
     compile files('libs/farcommon-0.1.jar')
 
-    compile 'com.rabbitmq:amqp-client:5.2.0'
-
     testCompile("junit:junit:4.12")
     testCompile("org.junit.jupiter:junit-jupiter-api:5.0.2")
     testCompile "org.mockito:mockito-core:2.+"
