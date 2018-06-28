@@ -1,6 +1,5 @@
 package com.spoohapps.jble6lowpanshoveld.integrationtests.connection.amqp091;
 
-import com.spoohapps.farcommon.model.Message;
 import com.spoohapps.farcommon.model.Profile;
 import com.spoohapps.farcommon.connection.ConnectionFactory;
 import com.spoohapps.farcommon.connection.ConnectionSettings;
