@@ -1,6 +1,5 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.farcommon.model.Message;
 import com.spoohapps.farcommon.connection.PublisherConnection;
 import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 
