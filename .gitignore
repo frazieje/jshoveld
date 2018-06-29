@@ -94,3 +94,5 @@ profile.conf
 
 err/
 log/
+
+client/
