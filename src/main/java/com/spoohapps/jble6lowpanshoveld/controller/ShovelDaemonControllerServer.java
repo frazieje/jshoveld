@@ -1,6 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.controller;
 
-public interface ShovelDaemonControllerBroadcaster {
+public interface ShovelDaemonControllerServer {
     void start();
     void stop();
 }

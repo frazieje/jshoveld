@@ -40,12 +40,12 @@ public class Config implements ShovelDaemonConfig {
 
     public static ShovelDaemonConfig fromDefaults() {
         Config config = new Config();
-        config.profileFilePath = Paths.get(System.getProperty("user.home"), "profile.conf").toString();
+        config.profileFilePath = Paths.get(System.getProperty("user.home"), "jble6lowpanshoveld", "profile.conf").toString();
         config.apiHost = "";
         config.nodeHost = "";
         config.apiPort = 5671;
         config.nodePort = 5671;
-        config.controllerPort = 1099;
+        config.controllerPort = 8080;
         return config;
     }
 

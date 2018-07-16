@@ -2,8 +2,8 @@ package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.Config;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
-import com.spoohapps.jble6lowpanshoveld.controller.RemoteShovelDaemonControllerBroadcaster;
-import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerBroadcaster;
+import com.spoohapps.jble6lowpanshoveld.controller.HTTPShovelDaemonControllerServer;
+import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerServer;
 import com.spoohapps.farcommon.model.Profile;
 import com.spoohapps.farcommon.model.TLSContext;
 import com.spoohapps.farcommon.connection.*;
@@ -36,7 +36,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     private ShovelManager shovelManager;
 
-    private ShovelDaemonControllerBroadcaster controllerBroadcaster;
+    private ShovelDaemonControllerServer controllerBroadcaster;
 
     private Set<ConnectionFactory> connectionFactories;
 
@@ -44,7 +44,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     public ShovelDaemon() {}
 
-    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager, ShovelManager shovelManager, ShovelDaemonControllerBroadcaster controllerBroadcaster) {
+    public ShovelDaemon(ShovelDaemonConfig config, ProfileManager profileManager, ShovelManager shovelManager, ShovelDaemonControllerServer controllerBroadcaster) {
 
         shovelDaemonConfig = config;
 
@@ -63,7 +63,25 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
     public ShovelDaemon(String[] args) {
 
-        shovelDaemonConfig = Config.fromDefaults().apply(Config.fromArgs(args));
+        String configFilePath = null;
+        try {
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("-configFile")) {
+                    configFilePath = args[i + 1];
+                }
+            }
+        } catch (Exception ignored) {}
+
+        shovelDaemonConfig = Config.fromDefaults();
+
+        try {
+            if (configFilePath != null) {
+                shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromStream(
+                        Files.newInputStream(Paths.get(configFilePath))));
+            }
+        } catch (Exception ignored) {}
+
+        shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromArgs(args));
 
         initialize();
     }
@@ -105,6 +123,8 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         logger.info("api host: {}", shovelDaemonConfig.apiHost());
         logger.info("api port: {}", shovelDaemonConfig.apiPort());
 
+        logger.info("controller port: {}", shovelDaemonConfig.controllerPort());
+
         connectionFactories = ConcurrentHashMap.newKeySet();
 
         shovelManager = new AutomaticRestartingShovelManager(executorService, 5000);
@@ -113,7 +133,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
 
         profileManager.onChanged(this::setProfileInternal);
 
-        controllerBroadcaster = new RemoteShovelDaemonControllerBroadcaster(this, shovelDaemonConfig.controllerPort());
+        controllerBroadcaster = new HTTPShovelDaemonControllerServer(this, shovelDaemonConfig.controllerPort());
     }
 
     @Override

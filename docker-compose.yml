@@ -1,0 +1,28 @@
+version: "3"
+services:
+  shovel:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq:rabbitmq
+    volumes:
+      - ./conf/jble6lowpanshoveld.conf:/app/jble6lowpanshoveld/jble6lowpanshoveld.conf
+      - ./conf/profile.conf:/root/jble6lowpanshoveld/profile.conf
+      - ./conf/rabbitmq/client/cacert.pem:/root/jble6lowpanshoveld/client/cacert.pem
+      - ./conf/rabbitmq/client/cert.pem:/root/jble6lowpanshoveld/client/cert.pem
+      - ./conf/rabbitmq/client/key.pem:/root/jble6lowpanshoveld/client/key8.pem
+
+  rabbitmq:
+    image: rabbitmq:3
+    ports:
+      - 15672:15672
+      - 5671:5671
+    volumes:
+      - ./conf/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+      - ./conf/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./conf/rabbitmq/server/cacert.pem:/etc/rabbitmq/cacert.pem
+      - ./conf/rabbitmq/server/cert.pem:/etc/rabbitmq/cert.pem
+      - ./conf/rabbitmq/server/key.pem:/etc/rabbitmq/key.pem

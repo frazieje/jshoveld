@@ -1,7 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld;
 
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
-import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerBroadcaster;
+import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerServer;
 import com.spoohapps.farcommon.model.Profile;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
@@ -30,7 +30,7 @@ public class WhenStartingShovelDaemonTests {
     private ProfileManager mockProfileManager;
     private ShovelManager mockShovelManager;
 
-    private ShovelDaemonControllerBroadcaster mockControllerBroadcaster;
+    private ShovelDaemonControllerServer mockControllerBroadcaster;
 
     private String expectedNodeHost = "localhost";
     private int expectedNodePort = 5671;
@@ -55,7 +55,7 @@ public class WhenStartingShovelDaemonTests {
 
         mockShovelManager = mock(ShovelManager.class);
 
-        mockControllerBroadcaster = mock(ShovelDaemonControllerBroadcaster.class);
+        mockControllerBroadcaster = mock(ShovelDaemonControllerServer.class);
 
         when(mockConfig.nodeHost()).thenReturn(expectedNodeHost);
         when(mockConfig.nodePort()).thenReturn(expectedNodePort);
