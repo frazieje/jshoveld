@@ -14,9 +14,8 @@ services:
       - ./conf/rabbitmq/client/cacert.pem:/root/jble6lowpanshoveld/client/cacert.pem
       - ./conf/rabbitmq/client/cert.pem:/root/jble6lowpanshoveld/client/cert.pem
       - ./conf/rabbitmq/client/key.pem:/root/jble6lowpanshoveld/client/key8.pem
-
   rabbitmq:
-    image: rabbitmq:3
+    image: www.spoohapps.com/rabbitmq
     ports:
       - 15672:15672
       - 5671:5671
