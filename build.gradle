@@ -21,6 +21,9 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url "https://www.spoohapps.com/artifactory/libs-release-local"
+    }
 }
 
 dependencies {
@@ -32,7 +35,7 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
-    compile files('libs/farcommon-0.1.jar')
+    compile group: 'com.spoohapps', name: 'farcommon', version: '0.1.0'
 
     testCompile("junit:junit:4.12")
     testCompile("org.junit.jupiter:junit-jupiter-api:5.0.2")
