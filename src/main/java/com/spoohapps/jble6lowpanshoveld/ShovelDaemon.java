@@ -14,7 +14,6 @@ import com.spoohapps.farcommon.connection.amqp091.rabbitmq.RabbitMqAmqp091Connec
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
-import org.apache.commons.daemon.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ShovelDaemon implements Daemon, ShovelDaemonController {
+public class ShovelDaemon implements ShovelDaemonController {
 
     private ScheduledExecutorService executorService;
 
@@ -86,33 +85,6 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         initialize();
     }
 
-    @Override
-    public void init(DaemonContext context) throws DaemonInitException, Exception {
-        String[] daemonArgs = context.getArguments();
-
-        String configFilePath = null;
-        try {
-            for (int i = 0; i < daemonArgs.length; i++) {
-                if (daemonArgs[i].equals("-configFile")) {
-                    configFilePath = daemonArgs[i + 1];
-                }
-            }
-        } catch (Exception ignored) {}
-
-        shovelDaemonConfig = Config.fromDefaults();
-
-        try {
-            if (configFilePath != null) {
-                shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromStream(
-                        Files.newInputStream(Paths.get(configFilePath))));
-            }
-        } catch (Exception ignored) {}
-
-        shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromArgs(context.getArguments()));
-
-        initialize();
-    }
-
     private void initialize() {
 
         executorService = Executors.newScheduledThreadPool(16);
@@ -136,7 +108,6 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         controllerBroadcaster = new HTTPShovelDaemonControllerServer(this, shovelDaemonConfig.controllerPort());
     }
 
-    @Override
     public void start() throws Exception {
 
         logger.info("Starting...");
@@ -148,7 +119,6 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         controllerBroadcaster.start();
     }
 
-    @Override
     public void stop() throws Exception {
 
         logger.info("Stopping...");
@@ -174,15 +144,7 @@ public class ShovelDaemon implements Daemon, ShovelDaemonController {
         }
     }
 
-    @Override
-    public void destroy() {
-
-    }
-
     public static void main(String[] args) {
-        for (String s : args) {
-            System.out.println(s);
-        }
         ShovelDaemon daemon = new ShovelDaemon(args);
         try {
             daemon.start();

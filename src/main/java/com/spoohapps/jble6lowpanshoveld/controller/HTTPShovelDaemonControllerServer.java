@@ -17,8 +17,6 @@ public class HTTPShovelDaemonControllerServer implements ShovelDaemonControllerS
 
     private final HttpServer httpServer;
 
-    public static final String ControllerName = "jble6lowpanshoveld";
-
     private final Logger logger = LoggerFactory.getLogger(HTTPShovelDaemonControllerServer.class);
 
     public HTTPShovelDaemonControllerServer(ShovelDaemonController controller, int port) {

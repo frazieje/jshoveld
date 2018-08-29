@@ -29,8 +29,6 @@ dependencies {
 
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
 
-    compile group: 'commons-daemon', name: 'commons-daemon', version: '1.0.15'
-
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
@@ -44,34 +42,3 @@ dependencies {
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.2")
     testRuntime("org.junit.vintage:junit-vintage-engine:4.12.2")
 }
-
-task copyToLib(type: Copy) {
-    into "$buildDir/output/libs"
-    from configurations.runtime
-}
-
-task generateInitScript(type: Copy) {
-    doFirst {
-        if (!System.env.'JAVA_HOME'?.trim()) {
-            throw new GradleException("JAVA_HOME is not set. Please set JAVA_HOME and try again")
-        }
-    }
-    def template_vars = [install_path: "$projectDir",
-                         java_home: System.env.'JAVA_HOME'?.trim(),
-                         class_path: "$buildDir/output/libs/*"]
-    def tag = /<%.*%>/
-    from "$projectDir/init.template"
-    into "$buildDir/output/init"
-    rename { file -> "jble6lowpanshoveld" }
-    filter { line ->
-        def sb = new StringBuffer()
-        def matches = (line =~ /$tag/)
-        def i = 0
-        while (matches.find()) {
-            matches.appendReplacement(sb, template_vars.get(matches[i].substring(2, matches[i].length()-2).trim()))
-        }
-        matches.appendTail(sb)
-        return sb.toString()
-    }
-}
-build.dependsOn(copyToLib)
