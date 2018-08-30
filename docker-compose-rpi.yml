@@ -13,7 +13,7 @@ services:
       - ./conf/rabbitmq/client/cert.pem:/root/jble6lowpanshoveld/client/cert.pem
       - ./conf/rabbitmq/client/key.pem:/root/jble6lowpanshoveld/client/key8.pem
   rabbitmq:
-    image: www.spoohapps.com/rabbitmq
+    image: www.spoohapps.com/rabbitmq-rpi
     ports:
       - 15672:15672
       - 5671:5671
