@@ -1,7 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.controller.api;
 
 import com.spoohapps.jble6lowpanshoveld.ShovelDaemonController;
-import com.spoohapps.jble6lowpanshoveld.controller.model.Status;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
