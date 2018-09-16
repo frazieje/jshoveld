@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class ShovelDaemon implements ShovelDaemonController {
 
@@ -154,8 +155,8 @@ public class ShovelDaemon implements ShovelDaemonController {
     }
 
     @Override
-    public List<String> shovelDescriptors() {
-        return shovelManager.shovelDescriptors();
+    public Supplier<List<String>> shovelDescriptors() {
+        return shovelManager::shovelDescriptors;
     }
 
     @Override
