@@ -1,7 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.farcommon.model.Message;
-import com.spoohapps.farcommon.connection.*;
+import com.spoohapps.farcommon.messaging.*;
 import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

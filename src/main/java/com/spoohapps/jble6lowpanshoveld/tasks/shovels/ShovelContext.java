@@ -1,7 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.farcommon.connection.ConnectionFactory;
-import com.spoohapps.farcommon.connection.ConnectionSettings;
+import com.spoohapps.farcommon.messaging.ConnectionFactory;
+import com.spoohapps.farcommon.messaging.ConnectionSettings;
 
 import java.util.Objects;
 

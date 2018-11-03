@@ -1,10 +1,10 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
 import com.spoohapps.farcommon.model.Message;
-import com.spoohapps.farcommon.connection.ConnectionFactory;
-import com.spoohapps.farcommon.connection.ConnectionSettings;
-import com.spoohapps.farcommon.connection.ConsumerConnection;
-import com.spoohapps.farcommon.connection.PublisherConnection;
+import com.spoohapps.farcommon.messaging.ConnectionFactory;
+import com.spoohapps.farcommon.messaging.ConnectionSettings;
+import com.spoohapps.farcommon.messaging.ConsumerConnection;
+import com.spoohapps.farcommon.messaging.PublisherConnection;
 import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;

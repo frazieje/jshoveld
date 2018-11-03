@@ -1,5 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.config;
 
+import com.spoohapps.farcommon.Config;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -36,7 +37,10 @@ public class WhenCascadingConfigsTests {
                 "-profileFilePath", expectedProfileFilePath,
         };
 
-        config = Config.fromArgs(simpleArgs).apply(Config.fromArgs(verboseArgs));
+        config = Config.from(ShovelDaemonConfig.class)
+                        .apply(simpleArgs)
+                        .apply(verboseArgs)
+                        .build();
     }
 
     @Test

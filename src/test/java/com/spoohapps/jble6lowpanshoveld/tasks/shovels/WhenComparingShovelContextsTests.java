@@ -1,6 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.farcommon.connection.ConnectionSettings;
+import com.spoohapps.farcommon.messaging.ConnectionSettings;
 import com.spoohapps.farcommon.testhelpers.FakeConnectionFactory;
 import com.spoohapps.farcommon.testhelpers.TestConnectionSettings;
 import org.junit.jupiter.api.Test;

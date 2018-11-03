@@ -1,16 +1,19 @@
 package com.spoohapps.jble6lowpanshoveld;
 
-import com.spoohapps.jble6lowpanshoveld.config.Config;
+import com.spoohapps.farcommon.Config;
+import com.spoohapps.farcommon.config.ConfigBuilder;
+import com.spoohapps.farcommon.messaging.amqp091.Exchanges;
+import com.spoohapps.jble6lowpanshoveld.config.DefaultShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.controller.HTTPShovelDaemonControllerServer;
 import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerServer;
 import com.spoohapps.farcommon.model.Profile;
 import com.spoohapps.farcommon.model.TLSContext;
-import com.spoohapps.farcommon.connection.*;
-import com.spoohapps.farcommon.connection.amqp091.Amqp091ConnectionFactory;
-import com.spoohapps.farcommon.connection.amqp091.Amqp091ConsumerConnectionSettings;
-import com.spoohapps.farcommon.connection.amqp091.Amqp091PublisherConnectionSettings;
-import com.spoohapps.farcommon.connection.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
+import com.spoohapps.farcommon.messaging.*;
+import com.spoohapps.farcommon.messaging.amqp091.Amqp091ConnectionFactory;
+import com.spoohapps.farcommon.messaging.amqp091.Amqp091ConsumerConnectionSettings;
+import com.spoohapps.farcommon.messaging.amqp091.Amqp091PublisherConnectionSettings;
+import com.spoohapps.farcommon.messaging.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.*;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
@@ -72,16 +75,19 @@ public class ShovelDaemon implements ShovelDaemonController {
             }
         } catch (Exception ignored) {}
 
-        shovelDaemonConfig = Config.fromDefaults();
+        ConfigBuilder<ShovelDaemonConfig> configBuilder = Config.from(ShovelDaemonConfig.class);
+
+        configBuilder.apply(new DefaultShovelDaemonConfig());
 
         try {
             if (configFilePath != null) {
-                shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromStream(
-                        Files.newInputStream(Paths.get(configFilePath))));
+                configBuilder.apply(Files.newInputStream(Paths.get(configFilePath)));
             }
         } catch (Exception ignored) {}
 
-        shovelDaemonConfig = shovelDaemonConfig.apply(Config.fromArgs(args));
+        configBuilder.apply(args);
+
+        shovelDaemonConfig = configBuilder.build();
 
         initialize();
     }
@@ -240,12 +246,12 @@ public class ShovelDaemon implements ShovelDaemonController {
                 new ShovelContext(
                         sourcefactory,
                         new Amqp091ConsumerConnectionSettings(
-                                "amq.topic",
+                                Exchanges.DEVICE,
                                 name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
-                                "far.app"
+                                Exchanges.FAR_APP
                         )),
                 name,
                 profileId);
@@ -257,12 +263,12 @@ public class ShovelDaemon implements ShovelDaemonController {
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
-                                "far.app",
+                                Exchanges.FAR_APP,
                                 name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
-                            "amq.topic"
+                                Exchanges.DEVICE
                         )),
                 name,
                 profileId);
@@ -274,12 +280,12 @@ public class ShovelDaemon implements ShovelDaemonController {
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
-                                "far.incoming",
+                                Exchanges.FAR_INCOMING,
                                 name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
-                                "far.app"
+                                Exchanges.FAR_APP
                         )),
                         name);
     }
@@ -290,12 +296,12 @@ public class ShovelDaemon implements ShovelDaemonController {
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
-                                "far.app",
+                                Exchanges.FAR_APP,
                                 name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
-                                "far.outgoing"
+                                Exchanges.FAR_OUTGOING
                         )),
                         name);
     }
@@ -306,12 +312,12 @@ public class ShovelDaemon implements ShovelDaemonController {
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
-                                "far.outgoing",
-                                "ConsumerQueue-" + profileId,
+                                Exchanges.FAR_OUTGOING,
+                                profileId,
                                 profileId + ".#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
-                                "far.incoming"
+                                Exchanges.FAR_INCOMING
                         )),
                         name);
     }
@@ -322,12 +328,12 @@ public class ShovelDaemon implements ShovelDaemonController {
                 new ShovelContext(
                         sourceFactory,
                         new Amqp091ConsumerConnectionSettings(
-                                "far.outgoing",
+                                Exchanges.FAR_OUTGOING,
                                 name + "Queue",
                                 "#"),
                         destinationFactory,
                         new Amqp091PublisherConnectionSettings(
-                                "far.incoming"
+                                Exchanges.FAR_INCOMING
                         )),
                 name);
     }

@@ -1,6 +1,6 @@
 package com.spoohapps.jble6lowpanshoveld.tasks.shovels;
 
-import com.spoohapps.farcommon.connection.PublisherConnection;
+import com.spoohapps.farcommon.messaging.PublisherConnection;
 import com.spoohapps.jble6lowpanshoveld.model.ShovelMessage;
 
 public class SimpleMessageShovel extends AbstractMessageShovel<SimpleMessageShovel> {

@@ -1,5 +1,7 @@
 package com.spoohapps.jble6lowpanshoveld.config;
 
+import com.spoohapps.farcommon.Config;
+import com.spoohapps.jble6lowpanshoveld.ShovelDaemon;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -39,7 +41,9 @@ public class WhenLoadingConfigFromStreamTests {
 
         InputStream configStream = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
 
-        config = Config.fromStream(configStream);
+        config = Config.from(ShovelDaemonConfig.class)
+                        .apply(configStream)
+                        .build();
     }
 
     @Test
