@@ -90,3 +90,5 @@ Temporary Items
 .apdisk
 
 !libs/*.jar
+
+conf/data/
