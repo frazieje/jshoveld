@@ -5,6 +5,8 @@ import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Singleton;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ControllerHK2Binder extends AbstractBinder {
 
@@ -27,5 +29,17 @@ public class ControllerHK2Binder extends AbstractBinder {
                 //ignore
             }
         }).to(ShovelDaemonController.class).in(Singleton.class);
+
+        bindFactory(new Factory<ExecutorService>() {
+            @Override
+            public ExecutorService provide() {
+                return Executors.newCachedThreadPool();
+            }
+
+            @Override
+            public void dispose(ExecutorService instance) {
+                instance.shutdownNow();
+            }
+        }).to(ExecutorService.class).in(Singleton.class);
     }
 }

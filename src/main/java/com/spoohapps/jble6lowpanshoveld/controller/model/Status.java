@@ -1,10 +1,10 @@
 package com.spoohapps.jble6lowpanshoveld.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class Status {
-
-    private int shovelCount;
 
     private List<String> shovelDescriptors;
 
@@ -12,12 +12,9 @@ public class Status {
         this.shovelDescriptors = shovelDescriptors;
     }
 
+    @JsonProperty
     public int getShovelCount() {
-        return shovelCount;
-    }
-
-    public void setShovelCount(int shovelCount) {
-        this.shovelCount = shovelCount;
+        return shovelDescriptors.size();
     }
 
     public List<String> getShovelDescriptors() {

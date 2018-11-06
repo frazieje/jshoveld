@@ -38,18 +38,6 @@ public class HTTPShovelDaemonControllerServer implements ShovelDaemonControllerS
                 new GrizzlyHttpContainerProvider().createContainer(GrizzlyHttpContainer.class, config);
 
         httpServer = GrizzlyHttpServerFactory.createHttpServer(baseUri, httpContainer, false, null, false);
-
-        binder.bindFactory(new Factory<ExecutorService>() {
-            @Override
-            public ExecutorService provide() {
-                return httpServer.getListener("grizzly").getTransport().getWorkerThreadPool();
-            }
-
-            @Override
-            public void dispose(ExecutorService instance) {
-
-            }
-        }).to(ExecutorService.class);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.spoohapps.jble6lowpanshoveld.controller.api;
 
 import com.spoohapps.jble6lowpanshoveld.ShovelDaemonController;
+import com.spoohapps.jble6lowpanshoveld.controller.model.Status;
+import org.glassfish.jersey.server.ManagedAsync;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -27,11 +29,12 @@ public class StatusResource {
     }
 
     @GET
+    @ManagedAsync
     @Produces({MediaType.APPLICATION_JSON})
     public void getSomething(@Suspended AsyncResponse asyncResponse) {
         CompletableFuture
                 .supplyAsync(controller.shovelDescriptors(), httpHandler)
-                .thenApply(descriptors -> asyncResponse.resume(Response.ok().entity(descriptors).build()))
+                .thenApply(descriptors -> asyncResponse.resume(Response.ok().entity(new Status(descriptors)).build()))
                 .exceptionally(e -> asyncResponse.resume(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build()));
     }
 
