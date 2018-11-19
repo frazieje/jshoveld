@@ -15,8 +15,8 @@ import com.spoohapps.farcommon.messaging.amqp091.Amqp091ConsumerConnectionSettin
 import com.spoohapps.farcommon.messaging.amqp091.Amqp091PublisherConnectionSettings;
 import com.spoohapps.farcommon.messaging.amqp091.rabbitmq.RabbitMqAmqp091ConnectionSupplier;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.*;
-import com.spoohapps.jble6lowpanshoveld.tasks.profile.FileBasedProfileManager;
-import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
+import com.spoohapps.farcommon.model.FileBasedProfileManager;
+import com.spoohapps.farcommon.model.ProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
