@@ -206,14 +206,14 @@ public class ShovelDaemon implements ShovelDaemonController {
 
                 shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, profileId));
 
-                TLSContext apiContext = newProfile.getApiContext();
+                TLSContext messageContext = newProfile.getRemoteMessageContext();
 
-                if (apiContext != null && apiContext.hasValue()) {
+                if (messageContext != null && messageContext.hasValue()) {
 
                     ConnectionFactory apiFactory = getOrCreateAmqp091ConnectionFactory(
                             shovelDaemonConfig.apiHost(),
                             shovelDaemonConfig.apiPort(),
-                            apiContext);
+                            messageContext);
 
                     shovels.add(getApiIncomingShovel(apiFactory, nodeFactory, profileId));
 
