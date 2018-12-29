@@ -1,9 +1,9 @@
 package com.spoohapps.jble6lowpanshoveld;
 
+import com.spoohapps.farcommon.model.ProfileManager;
 import com.spoohapps.jble6lowpanshoveld.config.ShovelDaemonConfig;
 import com.spoohapps.jble6lowpanshoveld.controller.ShovelDaemonControllerServer;
 import com.spoohapps.farcommon.model.Profile;
-import com.spoohapps.jble6lowpanshoveld.tasks.profile.ProfileManager;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.MessageShovel;
 import com.spoohapps.jble6lowpanshoveld.tasks.shovels.ShovelManager;
 import com.spoohapps.farcommon.testhelpers.ProfileFileHelper;
