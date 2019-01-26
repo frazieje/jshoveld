@@ -20,6 +20,7 @@ import com.spoohapps.farcommon.model.ProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -79,11 +80,13 @@ public class ShovelDaemon implements ShovelDaemonController {
 
         configBuilder.apply(new DefaultShovelDaemonConfig());
 
-        try {
-            if (configFilePath != null) {
-                configBuilder.apply(Files.newInputStream(Paths.get(configFilePath)));
+        if (configFilePath != null) {
+            try (InputStream fileStream = Files.newInputStream(Paths.get(configFilePath))) {
+                configBuilder.apply(fileStream);
+            } catch (Exception e) {
+                logger.error("error reading config file", e);
             }
-        } catch (Exception ignored) {}
+        }
 
         configBuilder.apply(args);
 
