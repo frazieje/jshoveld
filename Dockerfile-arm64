@@ -1,0 +1,22 @@
+FROM arm64v8/gradle:jdk8 as javabuilder
+
+COPY --chown=gradle:gradle . /home/gradle/src
+
+WORKDIR /home/gradle/src
+
+RUN gradle build -x test
+
+FROM arm64v8/openjdk:8-jdk
+
+COPY --from=javabuilder /home/gradle/src/build/distributions/jble6lowpanshoveld.tar /opt/
+
+WORKDIR /opt
+
+RUN tar -xvf jble6lowpanshoveld.tar && \
+    rm jble6lowpanshoveld.tar
+
+WORKDIR /opt/jble6lowpanshoveld
+
+EXPOSE 8080
+
+CMD bin/jble6lowpanshoveld -configFile /opt/jble6lowpanshoveld/jble6lowpanshoveld.conf
