@@ -99,11 +99,7 @@ public class ShovelDaemon implements ShovelDaemonController {
 
         executorService = Executors.newScheduledThreadPool(16);
 
-        logger.info("source host: {}", shovelDaemonConfig.nodeHost());
-        logger.info("source port: {}", shovelDaemonConfig.nodePort());
-
-        logger.info("api host: {}", shovelDaemonConfig.apiHost());
-        logger.info("api port: {}", shovelDaemonConfig.apiPort());
+        logger.info("profile file location: {}", shovelDaemonConfig.profileFilePath());
 
         logger.info("controller port: {}", shovelDaemonConfig.controllerPort());
 
@@ -190,13 +186,15 @@ public class ShovelDaemon implements ShovelDaemonController {
 
         String profileId = newProfile.getId();
 
-        TLSContext nodeContext = newProfile.getNodeContext();
+        if (newProfile.hasNodeValue()) {
 
-        if (nodeContext != null && nodeContext.hasValue()) {
+            TLSContext nodeContext = newProfile.getNodeContext();
+            String nodeHost = newProfile.getNodeHost();
+            int nodePort = newProfile.getNodePort();
 
             ConnectionFactory nodeFactory = getOrCreateAmqp091ConnectionFactory(
-                    shovelDaemonConfig.nodeHost(),
-                    shovelDaemonConfig.nodePort(),
+                    nodeHost,
+                    nodePort,
                     nodeContext);
 
             shovels.add(getAppIncomingShovel(nodeFactory, nodeFactory));
@@ -209,13 +207,15 @@ public class ShovelDaemon implements ShovelDaemonController {
 
                 shovels.add(getDeviceOutgoingShovel(nodeFactory, nodeFactory, profileId));
 
-                TLSContext messageContext = newProfile.getRemoteMessageContext();
+                if (newProfile.hasRemoteMessageValue()) {
 
-                if (messageContext != null && messageContext.hasValue()) {
+                    TLSContext messageContext = newProfile.getRemoteMessageContext();
+                    String messageHost = newProfile.getRemoteMessageHost();
+                    int messagePort = newProfile.getRemoteMessagePort();
 
                     ConnectionFactory apiFactory = getOrCreateAmqp091ConnectionFactory(
-                            shovelDaemonConfig.apiHost(),
-                            shovelDaemonConfig.apiPort(),
+                            messageHost,
+                            messagePort,
                             messageContext);
 
                     shovels.add(getApiIncomingShovel(apiFactory, nodeFactory, profileId));

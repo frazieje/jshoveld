@@ -10,36 +10,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WhenLoadingSimpleConfigTests {
 
-    private String expectedApiUrl = "http://www.spoohapps.com/";
-    private int expectedApiPort = 9999;
-    private int expectedSourcePort = 9998;
+    private String expectedProfileFilePath = "./profile.conf";
+    private int expectedControllerPort = 8081;
 
     private ShovelDaemonConfig config;
 
     @BeforeAll
     public void context() {
         String[] args = new String[] {
-            "-a", expectedApiUrl,
-            "-p", "" + expectedApiPort,
-            "-l", "" + expectedSourcePort
+            "-f", expectedProfileFilePath,
+            "-c", "" + expectedControllerPort
         };
 
         config = Config.from(ShovelDaemonConfig.class).apply(args).build();
     }
 
     @Test
-    public void shouldSetApiUrl() {
-        assertEquals(expectedApiUrl, config.apiHost());
+    public void shouldSetControllerPort() {
+        assertEquals(expectedControllerPort, config.controllerPort());
     }
 
     @Test
-    public void shouldSetApiPort() {
-        assertEquals(expectedApiPort, config.apiPort());
-    }
-
-    @Test
-    public void shouldSetSourcePort() {
-        assertEquals(expectedSourcePort, config.nodePort());
+    public void shouldSetProfileFilePath() {
+        assertEquals(expectedProfileFilePath, config.profileFilePath());
     }
 
 }

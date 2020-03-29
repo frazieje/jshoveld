@@ -11,11 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class WhenCascadingConfigsTests {
 
     private String expectedProfileFilePath = "./profile.conf";
-    private String expectedApiUrl = "www.spoohapps.com/";
-    private String expectedNodeHost = "localhost";
-
-    private int expectedApiPort = 9999;
-    private int expectedNodePort = 9998;
+    private int expectedControllerPort = 8081;
 
     private ShovelDaemonConfig config;
 
@@ -23,17 +19,12 @@ public class WhenCascadingConfigsTests {
     public void context() {
 
         String[] simpleArgs = new String[] {
-                "-a", "",
-                "-p", "" + 5672,
-                "-l", "" + 5672,
+                "-c", "",
                 "-f", "./profile.conf"
         };
 
         String[] verboseArgs = new String[] {
-                "-apiHost", expectedApiUrl,
-                "-apiPort", "" + expectedApiPort,
-                "-nodeHost", expectedNodeHost,
-                "-nodePort", "" + expectedNodePort,
+                "-controllerPort", "" + expectedControllerPort,
                 "-profileFilePath", expectedProfileFilePath,
         };
 
@@ -44,8 +35,8 @@ public class WhenCascadingConfigsTests {
     }
 
     @Test
-    public void shouldSetApiUrl() {
-        assertEquals(expectedApiUrl, config.apiHost());
+    public void shouldSetControllerPort() {
+        assertEquals(expectedControllerPort, config.controllerPort());
     }
 
     @Test
@@ -53,20 +44,6 @@ public class WhenCascadingConfigsTests {
         assertEquals(expectedProfileFilePath, config.profileFilePath());
     }
 
-    @Test
-    public void shouldSetApiPort() {
-        assertEquals(expectedApiPort, config.apiPort());
-    }
-
-    @Test
-    public void shouldSetNodeHost() {
-        assertEquals(expectedNodeHost, config.nodeHost());
-    }
-
-    @Test
-    public void shouldSetNodePort() {
-        assertEquals(expectedNodePort, config.nodePort());
-    }
 }
 
 

@@ -32,10 +32,6 @@ public class WhenStartingShovelDaemonTests {
 
     private ShovelDaemonControllerServer mockControllerBroadcaster;
 
-    private String expectedNodeHost = "localhost";
-    private int expectedNodePort = 5671;
-    private String expectedApiHost = "www.spoohapps.com";
-    private int expectedApiPort = 5671;
     private String expectedProfileFilePath = "/some/path/profile.conf";
 
     @Captor
@@ -56,12 +52,6 @@ public class WhenStartingShovelDaemonTests {
         mockShovelManager = mock(ShovelManager.class);
 
         mockControllerBroadcaster = mock(ShovelDaemonControllerServer.class);
-
-        when(mockConfig.nodeHost()).thenReturn(expectedNodeHost);
-        when(mockConfig.nodePort()).thenReturn(expectedNodePort);
-
-        when(mockConfig.apiHost()).thenReturn(expectedApiHost);
-        when(mockConfig.apiPort()).thenReturn(expectedApiPort);
 
         when(mockConfig.profileFilePath()).thenReturn(expectedProfileFilePath);
 
