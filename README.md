@@ -1,2 +1,2 @@
-# jble6lowpanshoveld
-Bluetooth 6LoWPAN message shoveling service
+# jshoveld
+MQTT -> AMQP Message shoveling service 
